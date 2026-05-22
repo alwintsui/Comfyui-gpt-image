@@ -42,6 +42,28 @@ PROMPT_MODEL_OPTIONS = [
 ]
 
 LUCK_PROMPT_CATEGORY = "Comfyui-Luck/gpt-2.0/文本"
+PROMPT_ASPECT_RATIO_OPTIONS = [
+    "auto",
+    "1:4",
+    "4:1",
+    "1:8",
+    "8:1",
+    "1:1",
+    "1:2",
+    "2:1",
+    "1:3",
+    "3:1",
+    "2:3",
+    "3:2",
+    "3:4",
+    "4:3",
+    "4:5",
+    "5:4",
+    "9:16",
+    "16:9",
+    "9:21",
+    "21:9",
+]
 _PROMPT_DIR = pathlib.Path(__file__).parent / "prompts"
 
 _REFERENCE_SYSTEM_PROMPT = (_PROMPT_DIR / "reference_image_optimizer_system.txt").read_text(encoding="utf-8-sig")
@@ -57,8 +79,8 @@ _REFERENCE_MODE_MAP = {
     "只参考版式": "layout_only",
 }
 
-_LANDSCAPE = {"16:9", "4:3", "3:2", "2:1", "21:9", "3:1"}
-_PORTRAIT = {"9:16", "3:4", "2:3", "1:2", "9:21", "1:3"}
+_LANDSCAPE = {"16:9", "4:3", "3:2", "2:1", "21:9", "3:1", "4:1", "8:1"}
+_PORTRAIT = {"9:16", "3:4", "2:3", "1:2", "9:21", "1:3", "1:4", "1:8"}
 _SQUARE = {"1:1"}
 
 
@@ -282,8 +304,7 @@ class LuckReferenceImagePromptOptimizer:
                     {"default": "自动判断"},
                 ),
                 "target_aspect_ratio": (
-                    ["auto", "1:1", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5",
-                     "3:2", "2:3", "3:1", "1:3", "2:1", "1:2", "21:9", "9:21"],
+                    PROMPT_ASPECT_RATIO_OPTIONS,
                     {"default": "auto"},
                 ),
                 "model": (PROMPT_MODEL_OPTIONS, {"default": "gemini-3.5-flash"}),
@@ -403,8 +424,7 @@ class LuckGPTImage2PromptOptimizer:
                 "model": (PROMPT_MODEL_OPTIONS, {"default": "gemini-3.5-flash"}),
                 "optimize_strength": (["标准", "增强"], {"default": "标准"}),
                 "aspect_ratio": (
-                    ["auto", "1:1", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5",
-                     "3:2", "2:3", "3:1", "1:3", "2:1", "1:2", "21:9", "9:21"],
+                    PROMPT_ASPECT_RATIO_OPTIONS,
                     {"default": "16:9"},
                 ),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 2147483647, "control_after_generate": True}),
