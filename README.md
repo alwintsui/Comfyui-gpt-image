@@ -203,9 +203,13 @@ python3 -m pip install -r requirements.txt
 
 可选域名：
 
-- 主域名：`https://api.apiyi.com`
+- 主域名：`http://api.apiyi.com:16888`
+- 备用：`http://b.apiyi.com:16888`
+- 兼容旧域名：`https://api.apiyi.com`
 - 备用：`https://vip.apiyi.com`
 - 备用：`https://b.apiyi.com`
+
+节点底层使用自定义 `requests.Session`，按 HTTP/1.1 行为请求接口，并把超时拆成连接超时 `30` 秒 + 节点面板里的读取超时秒数，减少长耗时生成时的中断。
 
 鉴权格式：
 

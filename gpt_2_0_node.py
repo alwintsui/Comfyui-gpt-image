@@ -21,11 +21,35 @@ import requests
 import torch
 
 
+DEFAULT_API_BASE_URL = "http://api.apiyi.com:16888"
 API_BASE_URLS = [
+    DEFAULT_API_BASE_URL,
+    "http://b.apiyi.com:16888",
     "https://api.apiyi.com",
     "https://b.apiyi.com",
     "https://vip.apiyi.com",
 ]
+API_CONNECT_TIMEOUT_SECONDS = 30
+APIYI_HTTP_SESSION = requests.Session()
+APIYI_HTTP_ADAPTER = requests.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10)
+APIYI_HTTP_SESSION.mount("http://", APIYI_HTTP_ADAPTER)
+APIYI_HTTP_SESSION.mount("https://", APIYI_HTTP_ADAPTER)
+
+
+def apiyi_timeout(timeout_seconds):
+    try:
+        read_timeout = int(timeout_seconds)
+    except (TypeError, ValueError):
+        read_timeout = 300
+    return (API_CONNECT_TIMEOUT_SECONDS, max(1, read_timeout))
+
+
+def apiyi_get(url, timeout_seconds, **kwargs):
+    return APIYI_HTTP_SESSION.get(url, timeout=apiyi_timeout(timeout_seconds), **kwargs)
+
+
+def apiyi_post(url, timeout_seconds, **kwargs):
+    return APIYI_HTTP_SESSION.post(url, timeout=apiyi_timeout(timeout_seconds), **kwargs)
 
 
 AUTO_RATIO_PROMPTS = {
@@ -411,7 +435,7 @@ class ComfyuiLuckGPT20Node:
                 "prompt (提示词)": ("STRING", {"default": "", "multiline": True}),
                 "mode (模式)": (["AUTO", "text2img", "img2img"], {"default": "AUTO"}),
                 "model (模型)": (cls.MODELS, {"default": "gpt-image-2-all"}),
-                "api_base (接口域名)": (API_BASE_URLS, {"default": "https://api.apiyi.com"}),
+                "api_base (接口域名)": (API_BASE_URLS, {"default": DEFAULT_API_BASE_URL}),
                 "endpoint (端点)": (["chat_completions (推荐)", "images_api (兼容)"], {"default": "chat_completions (推荐)"}),
                 "aspect_ratio (宽高比)": (cls.ASPECT_RATIOS, {"default": "AUTO"}),
                 "response_format (响应格式)": (["url", "b64_json"], {"default": "url"}),
@@ -472,7 +496,7 @@ class ComfyuiLuckGPT20Node:
             "User-Agent": "Comfyui-Luck gpt-2.0/1.0",
             "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
         }
-        response = requests.get(url, headers=headers, timeout=timeout_seconds)
+        response = apiyi_get(url, timeout_seconds, headers=headers)
         response.raise_for_status()
         return image_bytes_to_tensor(response.content)
 
@@ -533,11 +557,11 @@ class ComfyuiLuckGPT20Node:
         }
         if resolved_size:
             payload["size"] = resolved_size
-        return requests.post(
+        return apiyi_post(
             f"{api_base}/v1/images/generations",
+            timeout_seconds,
             headers={**headers, "Content-Type": "application/json"},
             json=payload,
-            timeout=timeout_seconds,
         )
 
     def _request_img2img(self, api_base, headers, model, prompt, response_format, resolved_size, image_payloads, timeout_seconds):
@@ -552,12 +576,12 @@ class ComfyuiLuckGPT20Node:
             ("image[]", (filename, BytesIO(image_bytes), "image/png"))
             for filename, image_bytes in image_payloads
         ]
-        return requests.post(
+        return apiyi_post(
             f"{api_base}/v1/images/edits",
+            timeout_seconds,
             headers=headers,
             data=data,
             files=files,
-            timeout=timeout_seconds,
         )
 
     def _request_chat(self, api_base, headers, model, prompt, resolved_size, image_payloads, timeout_seconds):
@@ -576,11 +600,11 @@ class ComfyuiLuckGPT20Node:
         }
         if resolved_size:
             payload["size"] = resolved_size
-        return requests.post(
+        return apiyi_post(
             f"{api_base}/v1/chat/completions",
+            timeout_seconds,
             headers={**headers, "Content-Type": "application/json"},
             json=payload,
-            timeout=timeout_seconds,
         )
 
     def generate(self, **kwargs):
@@ -588,7 +612,7 @@ class ComfyuiLuckGPT20Node:
         prompt = kwargs.get("prompt (提示词)", "")
         mode = kwargs.get("mode (模式)", "AUTO")
         model = kwargs.get("model (模型)", "gpt-image-2-all")
-        api_base = kwargs.get("api_base (接口域名)", "https://api.apiyi.com").rstrip("/")
+        api_base = kwargs.get("api_base (接口域名)", DEFAULT_API_BASE_URL).rstrip("/")
         endpoint = kwargs.get("endpoint (端点)", "chat_completions (推荐)")
         aspect_ratio = kwargs.get("aspect_ratio (宽高比)", "AUTO")
         response_format = kwargs.get("response_format (响应格式)", "url")
@@ -795,7 +819,7 @@ class ComfyuiLuckGPTImage2VipNode(ComfyuiLuckGPT20Node):
                 "prompt (提示词)": ("STRING", {"default": "", "multiline": True}),
                 "mode (模式)": (["AUTO", "text2img", "img2img"], {"default": "AUTO"}),
                 "model (模型)": (cls.MODELS, {"default": "gpt-image-2-vip"}),
-                "api_base (接口域名)": (API_BASE_URLS, {"default": "https://api.apiyi.com"}),
+                "api_base (接口域名)": (API_BASE_URLS, {"default": DEFAULT_API_BASE_URL}),
                 "endpoint (端点)": (["chat_completions (推荐)", "images_api (兼容)"], {"default": "chat_completions (推荐)"}),
                 "image_size (VIP分辨率)": (cls.IMAGE_SIZES, {"default": "2K Recommended"}),
                 "aspect_ratio (VIP宽高比)": (cls.ASPECT_RATIOS, {"default": "16:9"}),
@@ -827,7 +851,7 @@ class ComfyuiLuckGPTImage2VipNode(ComfyuiLuckGPT20Node):
         prompt = kwargs.get("prompt (提示词)", "")
         mode = kwargs.get("mode (模式)", "AUTO")
         model = kwargs.get("model (模型)", "gpt-image-2-vip")
-        api_base = kwargs.get("api_base (接口域名)", "https://api.apiyi.com").rstrip("/")
+        api_base = kwargs.get("api_base (接口域名)", DEFAULT_API_BASE_URL).rstrip("/")
         endpoint = kwargs.get("endpoint (端点)", "chat_completions (推荐)")
         image_size = kwargs.get("image_size (VIP分辨率)", "2K Recommended")
         aspect_ratio = kwargs.get("aspect_ratio (VIP宽高比)", "16:9")
@@ -1063,7 +1087,7 @@ class ComfyuiLuckGPTImage2Node:
                 "prompt (提示词)": ("STRING", {"default": "", "multiline": True}),
                 "mode (模式)": (["AUTO", "text2img", "img2img"], {"default": "AUTO"}),
                 "model (模型)": (cls.MODELS, {"default": "gpt-image-2"}),
-                "api_base (接口域名)": (API_BASE_URLS, {"default": "https://api.apiyi.com"}),
+                "api_base (接口域名)": (API_BASE_URLS, {"default": DEFAULT_API_BASE_URL}),
                 "image_size (分辨率)": (cls.IMAGE_SIZES, {"default": "2K"}),
                 "aspect_ratio (宽高比)": (cls.ASPECT_RATIOS, {"default": "16:9"}),
                 "custom_size (仅custom填写: 宽x高)": ("STRING", {"default": "1600x1200", "multiline": False}),
@@ -1124,11 +1148,11 @@ class ComfyuiLuckGPTImage2Node:
         return fields
 
     def _request_text2img(self, api_base, headers, fields, timeout_seconds):
-        return requests.post(
+        return apiyi_post(
             f"{api_base}/v1/images/generations",
+            timeout_seconds,
             headers={**headers, "Content-Type": "application/json"},
             json=fields,
-            timeout=timeout_seconds,
         )
 
     def _request_img2img(self, api_base, headers, fields, image_payloads, mask_bytes, timeout_seconds):
@@ -1140,12 +1164,12 @@ class ComfyuiLuckGPTImage2Node:
             files.append(("mask", ("mask.png", BytesIO(mask_bytes), "image/png")))
 
         data = {key: str(value) for key, value in fields.items()}
-        return requests.post(
+        return apiyi_post(
             f"{api_base}/v1/images/edits",
+            timeout_seconds,
             headers=headers,
             data=data,
             files=files,
-            timeout=timeout_seconds,
         )
 
     def _parse_response_images(self, data):
@@ -1172,7 +1196,7 @@ class ComfyuiLuckGPTImage2Node:
         prompt = kwargs.get("prompt (提示词)", "")
         mode = kwargs.get("mode (模式)", "AUTO")
         model = kwargs.get("model (模型)", "gpt-image-2")
-        api_base = kwargs.get("api_base (接口域名)", "https://api.apiyi.com").rstrip("/")
+        api_base = kwargs.get("api_base (接口域名)", DEFAULT_API_BASE_URL).rstrip("/")
         image_size = kwargs.get(
             "image_size (分辨率)",
             kwargs.get("size_ratio (尺寸/比例)", kwargs.get("size (尺寸)", "2K")),

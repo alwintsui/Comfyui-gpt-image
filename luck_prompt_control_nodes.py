@@ -17,7 +17,7 @@ import uuid
 
 import requests
 
-from .gpt_2_0_node import API_BASE_URLS, tensor_to_data_url
+from .gpt_2_0_node import API_BASE_URLS, DEFAULT_API_BASE_URL, apiyi_post, tensor_to_data_url
 from .gpt_2_0_node import emit_runtime_status
 
 try:
@@ -85,7 +85,7 @@ _SQUARE = {"1:1"}
 
 
 def _chat_url(api_base):
-    base = (api_base or "https://api.apiyi.com").strip().rstrip("/")
+    base = (api_base or DEFAULT_API_BASE_URL).strip().rstrip("/")
     if base.endswith("/v1/chat/completions"):
         return base
     if base.endswith("/v1"):
@@ -131,11 +131,11 @@ def _call_apiyi_chat(api_base, api_key, model, messages, timeout_seconds=600):
         "messages": messages,
         "stream": False,
     }
-    response = requests.post(
+    response = apiyi_post(
         _chat_url(api_base),
+        timeout_seconds,
         headers=_api_headers(api_key),
         json=payload,
-        timeout=(30, int(timeout_seconds)),
     )
     try:
         response.raise_for_status()
@@ -296,7 +296,7 @@ class LuckReferenceImagePromptOptimizer:
         return {
             "required": {
                 "api_key (API密钥)": ("STRING", {"default": "", "multiline": False}),
-                "api_base (接口域名)": (API_BASE_URLS, {"default": "https://api.apiyi.com"}),
+                "api_base (接口域名)": (API_BASE_URLS, {"default": DEFAULT_API_BASE_URL}),
                 "reference_image_01": ("IMAGE",),
                 "user_prompt": ("STRING", {"multiline": True, "default": ""}),
                 "reference_mode": (
@@ -354,7 +354,7 @@ class LuckReferenceImagePromptOptimizer:
     def optimize(self, reference_image_01, user_prompt, reference_mode, target_aspect_ratio,
                  model, seed=0, subject_image=None, **kwargs):
         api_key = kwargs.get("api_key (API密钥)", "")
-        api_base = kwargs.get("api_base (接口域名)", "https://api.apiyi.com")
+        api_base = kwargs.get("api_base (接口域名)", DEFAULT_API_BASE_URL)
         timeout_seconds = kwargs.get("timeout_seconds (超时秒数)", 600)
         unique_id = kwargs.get("unique_id")
         start_ts = time.time()
@@ -411,7 +411,7 @@ class LuckGPTImage2PromptOptimizer:
         return {
             "required": {
                 "api_key (API密钥)": ("STRING", {"default": "", "multiline": False}),
-                "api_base (接口域名)": (API_BASE_URLS, {"default": "https://api.apiyi.com"}),
+                "api_base (接口域名)": (API_BASE_URLS, {"default": DEFAULT_API_BASE_URL}),
                 "user_prompt": ("STRING", {"multiline": True, "default": ""}),
                 "layout_type": (
                     ["自动判断", "纯画面", "图文混排海报", "电商主图", "社媒封面"],
@@ -458,7 +458,7 @@ class LuckGPTImage2PromptOptimizer:
     def optimize(self, user_prompt, layout_type, text_policy, model, optimize_strength,
                  aspect_ratio="16:9", seed=0, exact_text="", **kwargs):
         api_key = kwargs.get("api_key (API密钥)", "")
-        api_base = kwargs.get("api_base (接口域名)", "https://api.apiyi.com")
+        api_base = kwargs.get("api_base (接口域名)", DEFAULT_API_BASE_URL)
         timeout_seconds = kwargs.get("timeout_seconds (超时秒数)", 600)
         unique_id = kwargs.get("unique_id")
         start_ts = time.time()
