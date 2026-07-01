@@ -2,10 +2,14 @@
 
 API易 GPT 图像模型的 ComfyUI 自定义节点包，当前包含出图节点和提示词控制节点：
 
+> **重要说明**
+>
+> API易图像模型能力会随上游状态变化，尤其是 `gpt-image-2-vip` 的 `size` 参数、输出分辨率和可用端点。本文档按当前 API易公开文档校准；如遇到接口行为变化、节点报错或文档不一致，请优先到 [GitHub Issues](https://github.com/luckdvr/Comfyui-Luck-gpt2.0/issues) 反馈，并附上节点名称、模型、端点、报错信息和 ComfyUI 控制台日志。
+
 | 节点 | 模型 | 适合场景 | 尺寸控制 |
 |---|---|---|---|
 | `Comfyui-Luck gpt-2.0 all` | `gpt-image-2-all` | 便宜、快、中文友好、文生图/改图/多图融合 | 只能把比例写进 prompt |
-| `Comfyui-Luck gpt-image-2-vip` | `gpt-image-2-vip` | 固定 `$0.03/张`、需要 30 档尺寸或 4K | 真正传 30 档 `size` API 参数 |
+| `Comfyui-Luck gpt-image-2-vip` | `gpt-image-2-vip` | 固定 `$0.03/张`、Codex 官逆线 | 当前 `size` 失效，仅用 prompt 控比例 |
 | `Comfyui-Luck gpt-image-2` | `gpt-image-2` | 需要真实 size、2K/4K、自定义尺寸、quality、mask | 真正传 `size` API 参数 |
 
 | 提示词节点 | 默认模型 | 适合场景 |
@@ -22,8 +26,8 @@ API易 GPT 图像模型的 ComfyUI 自定义节点包，当前包含出图节点
 
 - 只把图片接到 `图生图提示词控制器`：只做图像理解和提示词增强，后面可以按文生图使用优化后的 prompt。
 - 同一批图片同时接到后面的出图节点：才是真正的多图参考 / 多图编辑 / 多图融合。
-- 5 张图以内，优先接 `Comfyui-Luck gpt-image-2` 的 `image_01` 到 `image_05`，因为它支持真实 size、quality 和 mask。
-- 超过 5 张图时，可以改接 `Comfyui-Luck gpt-2.0 all` 或 `Comfyui-Luck gpt-image-2-vip`，它们最多支持 `image_01` 到 `image_14`。
+- 5 张图以内，优先接 `图生图提示词控制器` 一起分析，再把同一批图接到后面的出图节点。
+- `Comfyui-Luck gpt-image-2` 支持最多 16 张参考图，并支持真实 size、quality 和 mask；`gpt-2.0 all` / `gpt-image-2-vip` 目前最多支持 `image_01` 到 `image_14`。
 
 完整链路示例：
 
@@ -72,25 +76,28 @@ python3 -m pip install -r requirements.txt
 - 统一按次计费，约 `$0.03/张`。
 - ChatGPT 网页线，约 30-60 秒，出图较快。
 - 支持文生图、单图改图、多图融合、自然语言改图。
-- 默认走 API易主推的 `POST /v1/chat/completions`，提示词遵循更好。
-- 可切到 `images_api (兼容)`，走 `/v1/images/generations` 或 `/v1/images/edits`。
+- 默认走 API易当前更推荐的 Images API：`/v1/images/generations` 或 `/v1/images/edits`。
+- 可切到 `chat_completions (对话/URL参考图)`，用于对话式调用或在线 URL 参考图场景。
 - 不支持真实 `size`、`quality`、`n`、`aspect_ratio` API 字段，节点不会发送这些字段。
 
-比例控制只做很短的 prompt 前置，不加额外噪音。`gpt-image-2-all` 不传真实 `size`，但比例下拉已和提示词控制器统一，支持 `AUTO`、`1:4`、`4:1`、`1:8`、`8:1`、`1:1`、`1:2`、`2:1`、`1:3`、`3:1`、`2:3`、`3:2`、`3:4`、`4:3`、`4:5`、`5:4`、`9:16`、`16:9`、`9:21`、`21:9`。
+比例控制只做很短的 prompt 前置，不加额外噪音。`gpt-image-2-all` 不传真实 `size`，稳定度以 API易文档的实测前缀为准；其它比例只作为构图风格提示。
 
-| 需求 | 前置写法 |
-|---|---|
-| 方形 | `1024×1024 方图 / 1:1 方形构图` |
-| 横版 | `横版 16:9 / 宽屏 16:9 电影画幅` |
-| 竖版 | `竖版 9:16 / 手机海报 9:16` |
-| 超宽横幅 | `横幅 21:9 超宽银幕` |
-| 经典印刷 | `4:3 标准画幅` 或 `3:2 经典画幅` |
+| 需求 | 前置写法 | 文档实测输出 |
+|---|---|---:|
+| 横版 | `横版 16:9` | 约 `1672x941` |
+| 竖版 | `竖屏 9:16` | 约 `941x1672` |
+| 标准横版 | `4:3` | 约 `1448x1086` |
+| 标准竖版 | `3:4` | 约 `1086x1448` |
+| 经典横版 | `3:2 尺寸` | 约 `1536x1024` |
+| 经典竖版 | `2:3 尺寸` | 约 `1024x1536` |
+| 长竖屏 | `2:5 竖屏` | 约 `793x1983` |
+| 长横屏 | `5:2 横屏` | 约 `1983x793` |
 
 说明：
 
 - 这是提示词控制，不是硬尺寸控制。
-- `response_format` 只在 `images_api (兼容)` 端点里发送。
-- 默认 `chat_completions (推荐)` 端点会从 `choices[0].message.content` 里提取图片 URL 或 data URL。
+- `response_format` 只在 Images API 端点里发送。
+- `chat_completions` 端点会兼容解析 `choices[0].message.content` 里的图片 URL / data URL，也兼容 `data[].url` / `data[].b64_json`。
 - URL 输出通常是临时 CDN 链接，约 1 天有效；需要长期保存时请尽快转存。
 - 推荐超时：`300` 秒。
 - `408`、`429`、`5xx` 会按 `retry_times` 自动重试。
@@ -101,33 +108,19 @@ python3 -m pip install -r requirements.txt
 
 特点：
 
-- 统一按次计费，约 `$0.03/张`，所有 size 同价。
-- Codex 官逆线，约 90-150 秒，适合必须锁定尺寸或需要 4K 的场景。
+- 统一按次计费，约 `$0.03/张`。
+- Codex 官逆线，约 90-150 秒。
 - 支持文生图、单图改图、多图融合、自然语言改图。
-- 支持 `chat_completions (推荐)` 与 `images_api (兼容)` 两种端点。
-- 真正发送 `size` 字段；不支持 `quality` 和 `n`，节点不会发送这些字段。
+- 默认走 Images API；可切到 `chat_completions (对话/URL参考图)`。
+- API易文档 2026-06-23 起提示：`size` 参数再次失效，目前仅自适应 1K，2K / 4K / 锁尺寸暂不生效。
+- 本节点保留 `image_size` / `aspect_ratio` 控件兼容旧工作流，但当前默认不发送 `size`，只把比例写进 prompt 兜底。
+- 不支持 `quality` 和 `n`，节点不会发送这些字段。
 - `b64_json` 已带 `data:image/png;base64,` 前缀，节点会自动兼容解码。
-- VIP 的比例严格跟随 API易文档 30 档真实尺寸，只提供 `1:1`、`2:3`、`3:2`、`3:4`、`4:3`、`4:5`、`5:4`、`9:16`、`16:9`、`21:9`。如果要 `9:21`、`3:1`、`1:3` 等更多比例，请用 `gpt-image-2-all` 写进 prompt，或用官转 `gpt-image-2` 传真实合法 size。
-
-尺寸换算：
-
-| vip_aspect_ratio | 1K Fast | 2K Recommended | 4K Detail |
-|---|---:|---:|---:|
-| `1:1` | `1280x1280` | `2048x2048` | `2880x2880` |
-| `2:3` | `848x1280` | `1360x2048` | `2336x3520` |
-| `3:2` | `1280x848` | `2048x1360` | `3520x2336` |
-| `3:4` | `960x1280` | `1536x2048` | `2480x3312` |
-| `4:3` | `1280x960` | `2048x1536` | `3312x2480` |
-| `4:5` | `1024x1280` | `1632x2048` | `2560x3216` |
-| `5:4` | `1280x1024` | `2048x1632` | `3216x2560` |
-| `9:16` | `720x1280` | `1152x2048` | `2160x3840` |
-| `16:9` | `1280x720` | `2048x1152` | `3840x2160` |
-| `21:9` | `1280x544` | `2048x864` | `3840x1632` |
 
 说明：
 
-- 节点会把上表解析成真实 `size` 字段发送给 API。
-- `gpt-image-2-vip` 不接受表外尺寸；需要任意合法自定义尺寸时，请使用 `Comfyui-Luck gpt-image-2`。
+- `image_size` 当前只保留为界面提示和旧工作流兼容值，不代表真实输出分辨率。
+- 需要真实 `size`、`quality` 或 mask 局部重绘时，请使用 `Comfyui-Luck gpt-image-2`。
 - 推荐超时：`300` 秒。
 - `408`、`429`、`5xx` 会按 `retry_times` 自动重试。
 
@@ -141,7 +134,7 @@ python3 -m pip install -r requirements.txt
 - `quality`：`auto`、`low`、`medium`、`high`。
 - `output_format`：`png`、`jpeg`、`webp`。
 - `output_compression`：`jpeg` / `webp` 时可用，范围 0-100。
-- 支持最多 5 张参考图。
+- 支持最多 16 张参考图。
 - 支持可选 `mask` 局部重绘，透明区域 = 要重绘，不透明区域 = 保留。
 
 尺寸换算：
@@ -191,7 +184,7 @@ python3 -m pip install -r requirements.txt
 - `gpt-image-2` 返回的 `b64_json` 是纯 base64，不带 `data:image/...;base64,` 前缀；节点会自动解码成 ComfyUI 图片。
 - 节点不会发送 `input_fidelity`。
 - 节点主面板不再显示 `background` / `moderation`，默认不传，使用 API 默认值。
-- 推荐超时：`360` 秒。
+- 推荐超时按 `quality` 分档：`low` 至少 `120` 秒，`medium` 至少 `240` 秒，`high` 建议 `600` 秒起步；节点默认 `600` 秒。
 - `408`、`429`、`5xx` 会按 `retry_times` 自动重试。`408 Timeout` 通常是 APIYi 上游生成任务超时，不是节点参数填错。
 
 `background` / `moderation` 原本的作用：
@@ -203,13 +196,13 @@ python3 -m pip install -r requirements.txt
 
 可选域名：
 
-- 主域名：`http://api.apiyi.com:16888`
-- 备用：`http://b.apiyi.com:16888`
-- 兼容旧域名：`https://api.apiyi.com`
-- 备用：`https://vip.apiyi.com`
-- 备用：`https://b.apiyi.com`
+- 主域名：`https://api.apiyi.com/v1`
+- 国内备用 / 企业专用：`https://b.apiyi.com/v1`
+- 全球直连 / 海外推荐：`https://vip.apiyi.com/v1`
+- 兼容旧域名：`https://api.apiyi.com`、`https://b.apiyi.com`、`https://vip.apiyi.com`
+- 兼容旧工作流：`http://api.apiyi.com:16888`、`http://b.apiyi.com:16888`
 
-节点底层使用自定义 `requests.Session`，按 HTTP/1.1 行为请求接口，并把超时拆成连接超时 `30` 秒 + 节点面板里的读取超时秒数，减少长耗时生成时的中断。
+节点底层会兼容带 `/v1` 和不带 `/v1` 的 base url，并把超时拆成连接超时 `30` 秒 + 节点面板里的读取超时秒数，减少长耗时生成时的中断。
 
 鉴权格式：
 
@@ -223,10 +216,10 @@ Authorization: Bearer YOUR_API_KEY
 
 里面包含：
 
-- 一个 `gpt-image-2-all` 示例，默认使用推荐的 chat/completions 端点。
-- 一个 `gpt-image-2-vip` 示例，使用 `image_size=2K Recommended` + `aspect_ratio=16:9`，发送 `size=2048x1152`。
+- 一个 `gpt-image-2-all` 示例，默认使用推荐的 Images API 端点。
+- 一个 `gpt-image-2-vip` 示例，保留 `image_size` / `aspect_ratio` 控件但不发送当前失效的 `size`。
 - 一个 `gpt-image-2` 示例，使用真实 `size=2048x1152`、`quality=high`、`output_format=jpeg`。
-- 中文 Note 节点，说明三个模型怎么选、比例前置写法、VIP 30 档 size、真实尺寸控制和图片编辑/mask 用法。
+- 中文 Note 节点，说明三个模型怎么选、All/VIP 的 prompt 比例兜底、真实尺寸控制和图片编辑/mask 用法。
 
 分享工作流前请清空 API Key。
 
@@ -234,15 +227,15 @@ Authorization: Bearer YOUR_API_KEY
 
 ### gpt-image-2-all 能不能硬控 2K / 4K？
 
-不能。`gpt-image-2-all` 没有 `size` 参数，2K / 4K 只能作为 prompt 描述，无法保证输出像素。当前节点按你的要求只前置官方推荐比例写法，不再额外加入噪音尺寸描述。
+不能。`gpt-image-2-all` 没有 `size` 参数，2K / 4K 只能作为 prompt 描述，无法保证输出像素。当前节点只前置官方推荐比例写法，不额外加入噪音尺寸描述。
 
 ### gpt-image-2-vip 怎么用？
 
-添加 `Comfyui-Luck gpt-image-2-vip` 节点，再选 `image_size` 和 `aspect_ratio`。例如 `2K Recommended + 16:9` 会发送 `size=2048x1152`；`4K Detail + 16:9` 会发送 `size=3840x2160`。
+添加 `Comfyui-Luck gpt-image-2-vip` 节点后，`image_size` 和 `aspect_ratio` 仍可保留旧工作流习惯；但按 API易 2026-06-23 文档，`size` 当前失效，本节点不会发送 `size`，只把比例作为 prompt 前缀兜底。
 
 ### 哪个节点能真实控制分辨率？
 
-如果只需要 30 档常见尺寸并想固定 `$0.03/张`，用 `Comfyui-Luck gpt-image-2-vip`。如果需要任意合法自定义尺寸、`quality` 或 mask 局部重绘，用 `Comfyui-Luck gpt-image-2`。例如 `image_size=2K` + `aspect_ratio=4:3` 会真正向 API 传 `size=2048x1536`。
+如果需要真实 `size`、`quality` 或 mask 局部重绘，用 `Comfyui-Luck gpt-image-2`。`gpt-image-2-all` 和当前状态下的 `gpt-image-2-vip` 都只能用 prompt 控制比例，不能承诺像素级锁尺寸。
 
 ### 加载旧工作流报 `Value 3 smaller than min of 30`？
 

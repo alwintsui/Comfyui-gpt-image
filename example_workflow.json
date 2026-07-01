@@ -47,8 +47,8 @@
         "一张中文电影海报，标题文字写“未来之城”，霓虹灯街道，雨夜反光，人物站在画面中央，文字清晰可读，写实电影质感",
         "AUTO",
         "gpt-image-2-all",
-        "http://api.apiyi.com:16888",
-        "chat_completions (推荐)",
+        "https://api.apiyi.com/v1",
+        "images_api (推荐)",
         "16:9",
         "url",
         0,
@@ -97,7 +97,7 @@
       "mode": 0,
       "properties": {},
       "widgets_values": [
-        "【模型怎么选】\n\n1. Comfyui-Luck gpt-2.0 all\n   - gpt-image-2-all：$0.03/张，约 30-60 秒\n   - 不传真实 size，只把画幅写进 prompt\n\n2. Comfyui-Luck gpt-image-2-vip\n   - gpt-image-2-vip：$0.03/张，约 90-150 秒\n   - 用 image_size + aspect_ratio 传真实 size\n\n3. Comfyui-Luck gpt-image-2\n   - 官转模型，支持 quality / custom / mask\n   - timeout 建议 360 秒\n\n4. 提示词控制器\n   - 默认 gemini-3.5-flash\n   - 可选 gpt-5.5 / gpt-4o / gpt-4.1-mini\n   - API Key 和接口域名与 Luck 出图节点一致\n\n分享工作流前请清空 API Key。"
+        "【模型怎么选】\n\n1. Comfyui-Luck gpt-2.0 all\n   - gpt-image-2-all：$0.03/张，约 30-60 秒\n   - 不传真实 size，只把画幅写进 prompt\n   - 默认走 Images API，推荐超时 300 秒\n\n2. Comfyui-Luck gpt-image-2-vip\n   - gpt-image-2-vip：$0.03/张，约 90-150 秒\n   - API易文档 2026-06-23 起提示 size 当前失效\n   - 本节点不发送 size，仅用 prompt 比例兜底\n\n3. Comfyui-Luck gpt-image-2\n   - 官转模型，支持真实 size / quality / custom / mask\n   - timeout 按 quality 分档：low 120、medium 240、high 600 秒起步\n\n4. 提示词控制器\n   - 默认 gemini-3.5-flash\n   - API Key 和接口域名与 Luck 出图节点一致\n\n分享工作流前请清空 API Key。"
       ]
     },
     {
@@ -116,7 +116,7 @@
       "mode": 0,
       "properties": {},
       "widgets_values": [
-        "【all / vip 尺寸控制】\n\ngpt-image-2-all：\n- 没有真正的 size / quality / n / aspect_ratio API 参数\n- 节点不会传这些字段，只把 aspect_ratio 推荐写法放在 prompt 最前面\n- 比例列表已和提示词控制器统一：含 1:4、4:1、1:8、8:1、9:21、3:1、1:3 等\n- 这是提示词控制，不是像素级硬控\n\ngpt-image-2-vip：\n- 独立节点，会真正传 size\n- image_size：1K Fast / 2K Recommended / 4K Detail\n- aspect_ratio：严格按文档 30 档，1:1、2:3、3:2、3:4、4:3、4:5、5:4、9:16、16:9、21:9\n- 不支持 quality 和 n，节点不会发送"
+        "【all / vip 尺寸控制】\n\ngpt-image-2-all：\n- 没有真正的 size / quality / n / aspect_ratio API 参数\n- 节点不会传这些字段，只把比例推荐写法放在 prompt 最前面\n- 文档实测较稳：横版 16:9、竖屏 9:16、4:3、3:4、3:2 尺寸、2:3 尺寸、2:5 竖屏、5:2 横屏\n- 其它比例只是构图提示，不是像素级硬控\n\ngpt-image-2-vip：\n- API易文档提示 size 当前再次失效，仅自适应 1K\n- image_size / aspect_ratio 控件仅保留旧工作流兼容\n- 本节点不会发送 size，只用 prompt 比例前缀兜底\n- 需要真实 size / quality / mask 时请用 gpt-image-2"
       ]
     },
     {
@@ -127,7 +127,7 @@
         580
       ],
       "size": [
-        360,
+        600,
         230
       ],
       "flags": {},
@@ -135,7 +135,7 @@
       "mode": 0,
       "properties": {},
       "widgets_values": [
-        "【图片编辑 / 多图融合】\n\nall / vip 节点最多可接 image_01~image_14。\ngpt-image-2 官方节点最多可接 image_01~image_05，并可接 mask。\n\n多图时顺序有意义，可以在 prompt 里这样写：\n“把图1的人物放进图2的场景，参考图3的画风。”\n\nmask：透明区域 = 要重绘区域，仅对第一张 image 生效。"
+        "【图片编辑 / 多图融合】\n\nall / vip 节点最多可接 image_01~image_14。\ngpt-image-2 官方节点最多可接 image_01~image_16，并可接 mask。\n\n多图时顺序有意义，可以在 prompt 里这样写：\n“把图1的人物放进图2的场景，参考图3的画风。”\n\nmask：透明区域 = 要重绘区域，仅对第一张 image 生效。"
       ]
     },
     {
@@ -177,7 +177,7 @@
         "赛博朋克城市雨夜，霓虹招牌特写，电影画幅，文字清晰",
         "AUTO",
         "gpt-image-2",
-        "http://api.apiyi.com:16888",
+        "https://api.apiyi.com/v1",
         "2K",
         "16:9",
         "1600x1200",
@@ -186,7 +186,7 @@
         85,
         0,
         "randomize",
-        360,
+        600,
         3
       ]
     },
@@ -259,8 +259,8 @@
         "白色陶瓷马克杯放在灰色桌面上，柔和自然光，简洁产品摄影",
         "AUTO",
         "gpt-image-2-vip",
-        "http://api.apiyi.com:16888",
-        "chat_completions (推荐)",
+        "https://api.apiyi.com/v1",
+        "images_api (推荐)",
         "2K Recommended",
         "16:9",
         "url",
@@ -310,7 +310,7 @@
       "mode": 0,
       "properties": {},
       "widgets_values": [
-        "【gpt-image-2 真尺寸控制】\n\n官方节点会真正传 size 参数。\n现在按 Nano 风格拆成两栏：\n- image_size：auto / 1K / 2K / 4K / custom\n- aspect_ratio：AUTO、1:4、4:1、1:8、8:1、1:1、1:2、2:1、1:3、3:1、2:3、3:2、3:4、4:3、4:5、5:4、9:16、16:9、9:21、21:9\n\n例：image_size=2K + aspect_ratio=4:3，会发送 size=2048x1536。\n例：image_size=4K + aspect_ratio=16:9，会发送 size=3840x2160。\n例：image_size=2K + aspect_ratio=9:21，会发送 size=960x2240。\n\n注意：gpt-image-2 官方限制长边/短边≤3:1，所以 1:4、4:1、1:8、8:1 会自动收敛到合法边界，不会硬传非法比例。\n\ncustom_size 只在选择 custom 时填写，格式如 1600x1200。约束：最大边≤3840，宽高16倍数，长边/短边≤3:1，总像素 0.65MP 到 8.3MP。"
+        "【gpt-image-2 真尺寸控制】\n\n官方节点会真正传 size 参数。\n- image_size：auto / 1K / 2K / 4K / custom\n- aspect_ratio：AUTO、1:4、4:1、1:8、8:1、1:1、1:2、2:1、1:3、3:1、2:3、3:2、3:4、4:3、4:5、5:4、9:16、16:9、9:21、21:9\n\n例：image_size=2K + aspect_ratio=4:3，会发送 size=2048x1536。\n例：image_size=4K + aspect_ratio=16:9，会发送 size=3840x2160。\n\n注意：gpt-image-2 官方限制长边/短边≤3:1，超长比例会自动收敛到合法边界。\n\ntimeout 按 quality 分档：low 至少 120 秒，medium 至少 240 秒，high 建议 600 秒起步。\n\ncustom_size 只在选择 custom 时填写，格式如 1600x1200。约束：最大边≤3840，宽高16倍数，长边/短边≤3:1，总像素 0.65MP 到 8.3MP。"
       ]
     },
     {
@@ -368,7 +368,7 @@
       },
       "widgets_values": [
         "",
-        "http://api.apiyi.com:16888",
+        "https://api.apiyi.com/v1",
         "为一款高端白色陶瓷马克杯生成电商主图：干净背景，柔和自然光，突出质感，画面可加入简短中文标题“温润如玉”。",
         "电商主图",
         "保留原文",
@@ -426,7 +426,7 @@
         "",
         "AUTO",
         "gpt-image-2",
-        "http://api.apiyi.com:16888",
+        "https://api.apiyi.com/v1",
         "2K",
         "16:9",
         "1600x1200",
@@ -435,7 +435,7 @@
         85,
         0,
         "randomize",
-        360,
+        600,
         3
       ]
     },
@@ -447,7 +447,7 @@
         2180
       ],
       "size": [
-        360,
+        600,
         360
       ],
       "flags": {},
@@ -530,7 +530,7 @@
       },
       "widgets_values": [
         "",
-        "http://api.apiyi.com:16888",
+        "https://api.apiyi.com/v1",
         "综合参考 5 张图片的构图、光影、色彩、文字版式和共同视觉规律，并生成一条适合后面 gpt-image-2 多图生成的中文提示词。",
         "自动判断",
         "16:9",
@@ -617,7 +617,7 @@
       "mode": 0,
       "properties": {},
       "widgets_values": [
-        "【完整 5 图参考 -> 暂停编辑 -> 多图出图链路】\n\n下面 5 个 LoadImage 节点每张图都一拖二：\n1. 接到 图生图提示词控制器 reference_image_01~05，用来综合分析并生成 optimized_prompt。\n2. 同时接到 Comfyui-Luck gpt-image-2 的 image_01~05，用来让最终出图真实参考这 5 张图。\n\n正确执行链路：\n图生图提示词控制器 optimized_prompt -> 文本停留编辑器 text_list -> edited_text -> 后面出图节点 prompt。\n\n点击 Continue 只会放行当前等待中的流程，让后面的 gpt-image-2 继续生图；不要再次点击主运行按钮，否则会重新跑上游提示词增强。"
+        "【完整 5 图参考 -> 暂停编辑 -> 多图出图链路】\n\n下面 5 个 LoadImage 节点每张图都一拖二：\n1. 接到 图生图提示词控制器 reference_image_01~05，用来综合分析并生成 optimized_prompt。\n2. 同时接到 Comfyui-Luck gpt-image-2 的 image_01~05，用来让最终出图真实参考这 5 张图。\n\ngpt-image-2 官方节点最多可接 image_01~16；本示例只演示 5 张，因为提示词控制器最多分析 5 张。\n\n正确执行链路：\n图生图提示词控制器 optimized_prompt -> 文本停留编辑器 text_list -> edited_text -> 后面出图节点 prompt。\n\n点击 Continue 只会放行当前等待中的流程，让后面的 gpt-image-2 继续生图；不要再次点击主运行按钮，否则会重新跑上游提示词增强。"
       ]
     },
     {
@@ -890,7 +890,7 @@
         "",
         "AUTO",
         "gpt-image-2",
-        "http://api.apiyi.com:16888",
+        "https://api.apiyi.com/v1",
         "2K",
         "16:9",
         "1600x1200",
@@ -899,7 +899,7 @@
         85,
         0,
         "randomize",
-        360,
+        600,
         3
       ]
     },

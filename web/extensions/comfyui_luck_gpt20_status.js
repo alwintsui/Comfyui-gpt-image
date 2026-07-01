@@ -285,9 +285,9 @@ function renderNodeState(node, state) {
     if (status === "running") {
         displayText = `${message} · ${formatElapsed(elapsedSeconds)}`;
     } else if (status === "success") {
-        displayText = `完成 · ${formatElapsed(elapsedSeconds)}`;
+        displayText = `${message || "完成"} · ${formatElapsed(elapsedSeconds)}`;
     } else if (status === "error") {
-        displayText = `失败 · ${formatElapsed(elapsedSeconds)}`;
+        displayText = `失败：${message || "执行失败"} · ${formatElapsed(elapsedSeconds)}`;
     }
 
     statusWidget.element.dataset.state = status;
