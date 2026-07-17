@@ -33,11 +33,12 @@ except Exception:
 
 
 PROMPT_MODEL_OPTIONS = [
-    "gemini-3.5-flash",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-4o",
     "gpt-4.1-mini",
-    "gemini-2.5-flash",
+    "gemini-3.5-flash",
     "gemini-2.5-pro",
 ]
 

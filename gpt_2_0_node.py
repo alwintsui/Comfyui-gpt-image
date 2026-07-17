@@ -22,18 +22,14 @@ import requests
 import torch
 
 
-DEFAULT_API_BASE_URL = "https://api.apiyi.com/v1"
+DEFAULT_API_BASE_URL = "https://api.hpc4s.cn:8317/v1"
 API_BASE_URLS = [
     DEFAULT_API_BASE_URL,
-    "https://b.apiyi.com/v1",
-    "https://vip.apiyi.com/v1",
-    "https://api.apiyi.com",
-    "https://b.apiyi.com",
-    "https://vip.apiyi.com",
-    "http://api.apiyi.com:16888",
-    "http://b.apiyi.com:16888",
+    "https://api.hpc4s.cn/v1",
+    "https://api.openai.com/v1",
+    "https://api.apiyi.com/v1",
 ]
-API_CONNECT_TIMEOUT_SECONDS = 30
+API_CONNECT_TIMEOUT_SECONDS = 60
 APIYI_HTTP_SESSION = requests.Session()
 APIYI_HTTP_ADAPTER = requests.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10)
 APIYI_HTTP_SESSION.mount("http://", APIYI_HTTP_ADAPTER)
