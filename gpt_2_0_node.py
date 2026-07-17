@@ -12,6 +12,7 @@ controls.
 
 import base64
 import json
+import os
 import re
 import time
 from io import BytesIO
@@ -49,6 +50,16 @@ VIP_SIZE_DISABLED_NOTE = (
     "API易文档 2026-06-23 起提示 gpt-image-2-vip 的 size 参数当前再次失效，"
     "本节点不发送 size，仅用 prompt 前缀做比例兜底，输出为自适应 1K。"
 )
+
+
+def resolve_api_key(api_key):
+    """Use the node API key, falling back to OPENAI_API_KEY only when empty."""
+    key = (api_key or "").strip()
+    if not key:
+        key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not key:
+        raise ValueError("API Key 为空，且环境变量 OPENAI_API_KEY 未设置")
+    return key
 
 
 def apiyi_timeout(timeout_seconds):
@@ -672,9 +683,11 @@ class ComfyuiLuckGPT20Node:
         unique_id = kwargs.get("unique_id")
         start_ts = time.time()
 
-        if not api_key.strip():
-            emit_runtime_status(unique_id, "error", "API Key 为空", 0.0, 0, retry_times, timeout_seconds)
-            raise ValueError("API Key 不能为空")
+        try:
+            api_key = resolve_api_key(api_key)
+        except ValueError as exc:
+            emit_runtime_status(unique_id, "error", str(exc), 0.0, 0, retry_times, timeout_seconds)
+            raise
 
         effective_prompt, prompt_prefix = self._compose_prompt(prompt, aspect_ratio)
         resolved_size = None
@@ -692,7 +705,7 @@ class ComfyuiLuckGPT20Node:
             emit_runtime_status(unique_id, "error", "img2img 模式需要至少一张参考图", 0.0, 0, retry_times, timeout_seconds)
             raise ValueError("img2img 模式需要至少一张参考图")
 
-        headers = {"Authorization": f"Bearer {api_key.strip()}"}
+        headers = {"Authorization": f"Bearer {api_key}"}
         last_error = None
 
         print(f"[Comfyui-Luck gpt-2.0] endpoint={endpoint}, mode={actual_mode}, model={model}, api_base={api_base}, timeout={timeout_seconds}s, retry={retry_times}, resolved_size={resolved_size}")
@@ -933,9 +946,11 @@ class ComfyuiLuckGPTImage2VipNode(ComfyuiLuckGPT20Node):
         unique_id = kwargs.get("unique_id")
         start_ts = time.time()
 
-        if not api_key.strip():
-            emit_runtime_status(unique_id, "error", "API Key 为空", 0.0, 0, retry_times, timeout_seconds)
-            raise ValueError("API Key 不能为空")
+        try:
+            api_key = resolve_api_key(api_key)
+        except ValueError as exc:
+            emit_runtime_status(unique_id, "error", str(exc), 0.0, 0, retry_times, timeout_seconds)
+            raise
 
         clean_prompt = normalize_prompt_text(prompt)
         effective_prompt, prompt_prefix = self._compose_prompt(clean_prompt, aspect_ratio)
@@ -951,7 +966,7 @@ class ComfyuiLuckGPTImage2VipNode(ComfyuiLuckGPT20Node):
             emit_runtime_status(unique_id, "error", "img2img 模式需要至少一张参考图", 0.0, 0, retry_times, timeout_seconds)
             raise ValueError("img2img 模式需要至少一张参考图")
 
-        headers = {"Authorization": f"Bearer {api_key.strip()}"}
+        headers = {"Authorization": f"Bearer {api_key}"}
         last_error = None
 
         print(f"[Comfyui-Luck gpt-image-2-vip] 使用 seed: {seed} (not sent to API)")
@@ -1338,9 +1353,11 @@ class ComfyuiLuckGPTImage2Node:
         unique_id = kwargs.get("unique_id")
         start_ts = time.time()
 
-        if not api_key.strip():
-            emit_runtime_status(unique_id, "error", "API Key 为空", 0.0, 0, retry_times, timeout_seconds)
-            raise ValueError("API Key 不能为空")
+        try:
+            api_key = resolve_api_key(api_key)
+        except ValueError as exc:
+            emit_runtime_status(unique_id, "error", str(exc), 0.0, 0, retry_times, timeout_seconds)
+            raise
 
         clean_prompt = normalize_prompt_text(prompt)
         if not clean_prompt:
@@ -1361,7 +1378,7 @@ class ComfyuiLuckGPTImage2Node:
         if mask_bytes is not None and not image_payloads:
             raise ValueError("mask 只能和 image_01 一起用于图片编辑")
 
-        headers = {"Authorization": f"Bearer {api_key.strip()}"}
+        headers = {"Authorization": f"Bearer {api_key}"}
         fields = self._payload_fields(
             model,
             clean_prompt,

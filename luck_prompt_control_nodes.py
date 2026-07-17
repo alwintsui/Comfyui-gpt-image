@@ -17,7 +17,7 @@ import uuid
 
 import requests
 
-from .gpt_2_0_node import API_BASE_URLS, DEFAULT_API_BASE_URL, apiyi_post, tensor_to_data_url
+from .gpt_2_0_node import API_BASE_URLS, DEFAULT_API_BASE_URL, apiyi_post, resolve_api_key, tensor_to_data_url
 from .gpt_2_0_node import emit_runtime_status
 
 try:
@@ -95,9 +95,7 @@ def _chat_url(api_base):
 
 
 def _api_headers(api_key):
-    key = (api_key or "").strip()
-    if not key:
-        raise ValueError("API Key 不能为空")
+    key = resolve_api_key(api_key)
     return {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",

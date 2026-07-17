@@ -199,6 +199,7 @@ python3 -m pip install -r requirements.txt
 - 主域名：`https://api.apiyi.com/v1`
 - 国内备用 / 企业专用：`https://b.apiyi.com/v1`
 - 全球直连 / 海外推荐：`https://vip.apiyi.com/v1`
+- 第三方推荐：`https://api.hpc4s.cn:8317/v1`、`https://api.hpc4s.cn/v1`
 - 兼容旧域名：`https://api.apiyi.com`、`https://b.apiyi.com`、`https://vip.apiyi.com`
 - 兼容旧工作流：`http://api.apiyi.com:16888`、`http://b.apiyi.com:16888`
 
@@ -208,6 +209,18 @@ python3 -m pip install -r requirements.txt
 
 ```text
 Authorization: Bearer YOUR_API_KEY
+```
+
+项目的前端扩展会把节点中的 `api_key (API密钥)` 替换为真正的密码输入框，默认隐藏内容，并提供“显示/隐藏”切换按钮。API key 的读取规则如下：
+
+- 输入框为空：读取环境变量 `OPENAI_API_KEY`。
+- 输入框为其他非空内容：直接使用输入框中的值。
+- 输入框需要读取环境变量但 `OPENAI_API_KEY` 未设置或为空：节点会报错并停止请求。
+
+Linux/macOS 可以在启动 ComfyUI 前设置：
+
+```bash
+export OPENAI_API_KEY="sk-your-api-key"
 ```
 
 ## 示例工作流
