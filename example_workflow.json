@@ -1,172 +1,164 @@
 {
+  "id": "6ccb9ec2-7305-4ae7-b3e7-e64756bf421d",
+  "revision": 0,
   "last_node_id": 26,
   "last_link_id": 19,
   "nodes": [
     {
-      "id": 1,
-      "type": "ComfyuiLuckGPT20Node",
+      "id": 3,
+      "type": "Note",
       "pos": [
-        420,
-        180
+        -46.55492834943671,
+        5.908830142791742
       ],
       "size": [
-        520,
-        560
+        361.828125,
+        358.828125
       ],
       "flags": {},
       "order": 0,
       "mode": 0,
       "inputs": [],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            1
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "response",
-          "type": "STRING",
-          "links": null,
-          "slot_index": 1
-        },
-        {
-          "name": "image_urls",
-          "type": "STRING",
-          "links": null,
-          "slot_index": 2
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ComfyuiLuckGPT20Node"
-      },
+      "outputs": [],
+      "properties": {},
       "widgets_values": [
-        "",
-        "一张中文电影海报，标题文字写“未来之城”，霓虹灯街道，雨夜反光，人物站在画面中央，文字清晰可读，写实电影质感",
-        "AUTO",
-        "gpt-image-2-all",
-        "https://api.apiyi.com/v1",
-        "images_api (推荐)",
-        "16:9",
-        "url",
-        0,
-        "randomize",
-        300,
-        3
-      ]
+        "【模型怎么选】\n\n1. Comfyui-Luck gpt-image-2\n   - 官转模型，支持真实 size / quality / custom / mask\n   - timeout 按 quality 分档：low 120、medium 240、high 600 秒起步\n\n2. 提示词控制器\n   - 默认 gemini-3.5-flash\n   - API Key 和接口域名与 Luck 出图节点一致\n\n3. API key设置\n  - 推荐API key设置在环境变量OPENAI_API_KEY中\n  - 如果无法设置环境变量则明文写入API 可以文本框，并点击隐藏\n  - 注意分享工作流前请清空 API Key。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
-      "id": 2,
-      "type": "PreviewImage",
+      "id": 6,
+      "type": "ComfyuiLuckGPTImage2Node",
       "pos": [
-        1000,
-        180
+        374.54093801419424,
+        7.848143654767538
       ],
       "size": [
-        360,
-        360
+        520,
+        1022.375
       ],
       "flags": {},
       "order": 1,
       "mode": 0,
       "inputs": [
         {
-          "name": "images",
+          "name": "image_01",
+          "shape": 7,
           "type": "IMAGE",
-          "link": 1
+          "link": null
+        },
+        {
+          "name": "image_02",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_03",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_04",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_05",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_06",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_07",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_08",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_09",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_10",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_11",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_12",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_13",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_14",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_15",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_16",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
         }
       ],
-      "outputs": [],
-      "properties": {}
-    },
-    {
-      "id": 3,
-      "type": "Note",
-      "pos": [
-        40,
-        60
-      ],
-      "size": [
-        360,
-        430
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "properties": {},
-      "widgets_values": [
-        "【模型怎么选】\n\n1. Comfyui-Luck gpt-2.0 all\n   - gpt-image-2-all：$0.03/张，约 30-60 秒\n   - 不传真实 size，只把画幅写进 prompt\n   - 默认走 Images API，推荐超时 300 秒\n\n2. Comfyui-Luck gpt-image-2-vip\n   - gpt-image-2-vip：$0.03/张，约 90-150 秒\n   - API易文档 2026-06-23 起提示 size 当前失效\n   - 本节点不发送 size，仅用 prompt 比例兜底\n\n3. Comfyui-Luck gpt-image-2\n   - 官转模型，支持真实 size / quality / custom / mask\n   - timeout 按 quality 分档：low 120、medium 240、high 600 秒起步\n\n4. 提示词控制器\n   - 默认 gemini-3.5-flash\n   - API Key 和接口域名与 Luck 出图节点一致\n\n分享工作流前请清空 API Key。"
-      ]
-    },
-    {
-      "id": 4,
-      "type": "Note",
-      "pos": [
-        40,
-        420
-      ],
-      "size": [
-        330,
-        260
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "properties": {},
-      "widgets_values": [
-        "【all / vip 尺寸控制】\n\ngpt-image-2-all：\n- 没有真正的 size / quality / n / aspect_ratio API 参数\n- 节点不会传这些字段，只把比例推荐写法放在 prompt 最前面\n- 文档实测较稳：横版 16:9、竖屏 9:16、4:3、3:4、3:2 尺寸、2:3 尺寸、2:5 竖屏、5:2 横屏\n- 其它比例只是构图提示，不是像素级硬控\n\ngpt-image-2-vip：\n- API易文档提示 size 当前再次失效，仅自适应 1K\n- image_size / aspect_ratio 控件仅保留旧工作流兼容\n- 本节点不会发送 size，只用 prompt 比例前缀兜底\n- 需要真实 size / quality / mask 时请用 gpt-image-2"
-      ]
-    },
-    {
-      "id": 5,
-      "type": "Note",
-      "pos": [
-        1000,
-        580
-      ],
-      "size": [
-        600,
-        230
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "properties": {},
-      "widgets_values": [
-        "【图片编辑 / 多图融合】\n\nall / vip 节点最多可接 image_01~image_14。\ngpt-image-2 官方节点最多可接 image_01~image_16，并可接 mask。\n\n多图时顺序有意义，可以在 prompt 里这样写：\n“把图1的人物放进图2的场景，参考图3的画风。”\n\nmask：透明区域 = 要重绘区域，仅对第一张 image 生效。"
-      ]
-    },
-    {
-      "id": 6,
-      "type": "ComfyuiLuckGPTImage2Node",
-      "pos": [
-        420,
-        820
-      ],
-      "size": [
-        520,
-        620
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
       "outputs": [
         {
           "name": "image",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             2
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "response",
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -177,32 +169,33 @@
         "赛博朋克城市雨夜，霓虹招牌特写，电影画幅，文字清晰",
         "AUTO",
         "gpt-image-2",
-        "https://api.apiyi.com/v1",
+        "https://api.hpc4s.cn:8317/v1",
         "2K",
         "16:9",
         "1600x1200",
         "high",
         "jpeg",
         85,
-        0,
+        2079781927,
         "randomize",
         600,
-        3
+        3,
+        ""
       ]
     },
     {
       "id": 7,
       "type": "PreviewImage",
       "pos": [
-        1000,
-        820
+        980.1354591986827,
+        17.429105181305072
       ],
       "size": [
-        360,
-        360
+        563.4375,
+        673.3125
       ],
       "flags": {},
-      "order": 6,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -212,155 +205,86 @@
         }
       ],
       "outputs": [],
-      "properties": {}
-    },
-    {
-      "id": 9,
-      "type": "ComfyuiLuckGPTImage2VipNode",
-      "pos": [
-        420,
-        1500
-      ],
-      "size": [
-        520,
-        590
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            3
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "response",
-          "type": "STRING",
-          "links": null,
-          "slot_index": 1
-        },
-        {
-          "name": "image_urls",
-          "type": "STRING",
-          "links": null,
-          "slot_index": 2
-        }
-      ],
       "properties": {
-        "Node name for S&R": "ComfyuiLuckGPTImage2VipNode"
+        "Node name for S&R": "PreviewImage"
       },
-      "widgets_values": [
-        "",
-        "白色陶瓷马克杯放在灰色桌面上，柔和自然光，简洁产品摄影",
-        "AUTO",
-        "gpt-image-2-vip",
-        "https://api.apiyi.com/v1",
-        "images_api (推荐)",
-        "2K Recommended",
-        "16:9",
-        "url",
-        0,
-        "randomize",
-        300,
-        3
-      ]
-    },
-    {
-      "id": 10,
-      "type": "PreviewImage",
-      "pos": [
-        1000,
-        1500
-      ],
-      "size": [
-        360,
-        360
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 3
-        }
-      ],
-      "outputs": [],
-      "properties": {}
+      "widgets_values": []
     },
     {
       "id": 8,
       "type": "Note",
       "pos": [
-        40,
-        720
+        -45.45906198580572,
+        527.8481436547676
       ],
       "size": [
-        330,
-        270
+        344.375,
+        329.375
       ],
       "flags": {},
-      "order": 9,
+      "order": 2,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "properties": {},
       "widgets_values": [
         "【gpt-image-2 真尺寸控制】\n\n官方节点会真正传 size 参数。\n- image_size：auto / 1K / 2K / 4K / custom\n- aspect_ratio：AUTO、1:4、4:1、1:8、8:1、1:1、1:2、2:1、1:3、3:1、2:3、3:2、3:4、4:3、4:5、5:4、9:16、16:9、9:21、21:9\n\n例：image_size=2K + aspect_ratio=4:3，会发送 size=2048x1536。\n例：image_size=4K + aspect_ratio=16:9，会发送 size=3840x2160。\n\n注意：gpt-image-2 官方限制长边/短边≤3:1，超长比例会自动收敛到合法边界。\n\ntimeout 按 quality 分档：low 至少 120 秒，medium 至少 240 秒，high 建议 600 秒起步。\n\ncustom_size 只在选择 custom 时填写，格式如 1600x1200。约束：最大边≤3840，宽高16倍数，长边/短边≤3:1，总像素 0.65MP 到 8.3MP。"
-      ]
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 11,
       "type": "Note",
       "pos": [
-        40,
-        1040
+        13.454761098621537,
+        1851.562334080341
       ],
       "size": [
-        330,
-        360
+        339.8125,
+        312
       ],
       "flags": {},
-      "order": 10,
+      "order": 3,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "properties": {},
       "widgets_values": [
-        "【提示词控制器】\n\nGPT-Image-2 文生图提示词控制器：\n- 文字需求 -> 优化后的生图提示词\n- 默认 gemini-3.5-flash\n- 适合先增强 prompt，再接 gpt-image-2 出图\n\n图生图提示词控制器：\n- reference_image_01 必填\n- reference_image_02~05 可选，可最多 5 张参考图一起分析\n- subject_image 可选，用来锁定主体\n- 只接它：只做图像理解和提示词增强\n- 同时把图片接到后面出图节点：才是真正多图参考/多图融合\n\n模型下拉顺序：\ngemini-3.5-flash / gpt-5.5 / gpt-4o / gpt-4.1-mini / gemini-2.5-flash / gemini-2.5-pro"
-      ]
+        "【提示词控制器】\n\nGPT-Image-2 文生图提示词控制器：\n- 文字需求 -> 优化后的生图提示词\n- 默认 gemini-3.5-flash\n- 适合先增强 prompt，再接 gpt-image-2 出图\n\n图生图提示词控制器：\n- reference_image_01 必填\n- reference_image_02~05 可选，可最多 5 张参考图一起分析\n- subject_image 可选，用来锁定主体\n- 只接它：只做图像理解和提示词增强\n- 同时把图片接到后面出图节点：才是真正多图参考/多图融合"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 12,
       "type": "LuckGPTImage2PromptOptimizer",
       "pos": [
-        420,
-        2180
+        -646.5452389013784,
+        1321.562334080341
       ],
       "size": [
-        560,
-        520
+        581.75,
+        894.8125
       ],
       "flags": {},
-      "order": 11,
+      "order": 4,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
           "name": "optimized_prompt",
           "type": "STRING",
+          "slot_index": 0,
           "links": [
             4
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "debug_info",
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -368,37 +292,143 @@
       },
       "widgets_values": [
         "",
-        "https://api.apiyi.com/v1",
+        "https://api.hpc4s.cn:8317/v1",
         "为一款高端白色陶瓷马克杯生成电商主图：干净背景，柔和自然光，突出质感，画面可加入简短中文标题“温润如玉”。",
         "电商主图",
         "保留原文",
-        "gemini-3.5-flash",
+        "gpt-5.6-terra",
         "标准",
         "16:9",
-        0,
+        823230530,
         "randomize",
         600,
-        "温润如玉"
+        "温润如玉",
+        ""
       ]
     },
     {
       "id": 13,
       "type": "ComfyuiLuckGPTImage2Node",
       "pos": [
-        1660,
-        2180
+        833.4547610986217,
+        1331.562334080341
       ],
       "size": [
         520,
-        620
+        1022.375
       ],
       "flags": {},
-      "order": 13,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
+          "name": "image_01",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_02",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_03",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_04",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_05",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_06",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_07",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_08",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_09",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_10",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_11",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_12",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_13",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_14",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_15",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_16",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        },
+        {
           "name": "prompt (提示词)",
           "type": "STRING",
+          "widget": {
+            "name": "prompt (提示词)"
+          },
           "link": 18
         }
       ],
@@ -406,16 +436,16 @@
         {
           "name": "image",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             5
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "response",
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -426,32 +456,33 @@
         "",
         "AUTO",
         "gpt-image-2",
-        "https://api.apiyi.com/v1",
+        "https://api.hpc4s.cn:8317/v1",
         "2K",
         "16:9",
         "1600x1200",
         "high",
         "jpeg",
         85,
-        0,
+        1092220714,
         "randomize",
         600,
-        3
+        3,
+        ""
       ]
     },
     {
       "id": 14,
       "type": "PreviewImage",
       "pos": [
-        2240,
-        2180
+        1485.9111969754936,
+        1341.2236960420641
       ],
       "size": [
-        600,
-        360
+        796.0625,
+        834.953125
       ],
       "flags": {},
-      "order": 14,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -461,22 +492,25 @@
         }
       ],
       "outputs": [],
-      "properties": {}
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
     },
     {
       "id": 15,
       "type": "LuckReferenceImagePromptOptimizer",
       "pos": [
-        640,
-        3300
+        130.99990101763657,
+        2782.800117615686
       ],
       "size": [
         560,
         620
       ],
       "flags": {},
-      "order": 22,
-      "mode": 0,
+      "order": 14,
+      "mode": 2,
       "inputs": [
         {
           "name": "reference_image_01",
@@ -485,26 +519,31 @@
         },
         {
           "name": "reference_image_02",
+          "shape": 7,
           "type": "IMAGE",
           "link": 8
         },
         {
           "name": "reference_image_03",
+          "shape": 7,
           "type": "IMAGE",
           "link": 10
         },
         {
           "name": "reference_image_04",
+          "shape": 7,
           "type": "IMAGE",
           "link": 12
         },
         {
           "name": "reference_image_05",
+          "shape": 7,
           "type": "IMAGE",
           "link": 14
         },
         {
           "name": "subject_image",
+          "shape": 7,
           "type": "IMAGE",
           "link": null
         }
@@ -513,16 +552,16 @@
         {
           "name": "optimized_prompt",
           "type": "STRING",
+          "slot_index": 0,
           "links": [
             16
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "reference_summary",
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -530,29 +569,30 @@
       },
       "widgets_values": [
         "",
-        "https://api.apiyi.com/v1",
+        "https://api.hpc4s.cn:8317/v1",
         "综合参考 5 张图片的构图、光影、色彩、文字版式和共同视觉规律，并生成一条适合后面 gpt-image-2 多图生成的中文提示词。",
         "自动判断",
         "16:9",
-        "gemini-3.5-flash",
-        0,
+        "gpt-5.6-terra",
+        1889558342,
         "randomize",
-        600
+        600,
+        ""
       ]
     },
     {
       "id": 16,
       "type": "LuckTextListEditor",
       "pos": [
-        1040,
-        2180
+        153.45476109862153,
+        1321.562334080341
       ],
       "size": [
         520,
         320
       ],
       "flags": {},
-      "order": 12,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -565,16 +605,17 @@
         {
           "name": "edited_text",
           "type": "STRING",
+          "slot_index": 0,
           "links": [
             18
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "edited_texts",
+          "shape": 6,
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -586,70 +627,78 @@
       "id": 17,
       "type": "Note",
       "pos": [
-        40,
-        1440
+        403.4547610986216,
+        1861.562334080341
       ],
       "size": [
         330,
         300
       ],
       "flags": {},
-      "order": 16,
+      "order": 5,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "properties": {},
       "widgets_values": [
         "【文本停留编辑器】\n\n正确接法：\n提示词增强器 optimized_prompt -> 文本停留编辑器 text_list -> edited_text -> 出图节点 prompt。\n\nedited_text 是单条字符串，专门给普通 prompt 输入用。\nedited_texts 是列表输出，保留给批量文本工作流。\n\n点击 Continue 后，后面的出图节点才会继续执行。点击 Cancel 会中断当前执行。"
-      ]
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 25,
       "type": "Note",
       "pos": [
-        40,
-        2860
+        1800.9999010176366,
+        3072.800117615686
       ],
       "size": [
-        540,
-        330
+        528.0625,
+        493.6875
       ],
       "flags": {},
-      "order": 16,
-      "mode": 0,
+      "order": 6,
+      "mode": 2,
+      "inputs": [],
+      "outputs": [],
       "properties": {},
       "widgets_values": [
-        "【完整 5 图参考 -> 暂停编辑 -> 多图出图链路】\n\n下面 5 个 LoadImage 节点每张图都一拖二：\n1. 接到 图生图提示词控制器 reference_image_01~05，用来综合分析并生成 optimized_prompt。\n2. 同时接到 Comfyui-Luck gpt-image-2 的 image_01~05，用来让最终出图真实参考这 5 张图。\n\ngpt-image-2 官方节点最多可接 image_01~16；本示例只演示 5 张，因为提示词控制器最多分析 5 张。\n\n正确执行链路：\n图生图提示词控制器 optimized_prompt -> 文本停留编辑器 text_list -> edited_text -> 后面出图节点 prompt。\n\n点击 Continue 只会放行当前等待中的流程，让后面的 gpt-image-2 继续生图；不要再次点击主运行按钮，否则会重新跑上游提示词增强。"
-      ]
+        "【图片编辑 / 多图融合】\n\ngpt-image-2 官方节点最多可接 image_01~image_16，并可接 mask。\n\n多图时顺序有意义，可以在 prompt 里这样写：\n“把图1的人物放进图2的场景，参考图3的画风。”\n\nmask：透明区域 = 要重绘区域，仅对第一张 image 生效。\n\n【完整 5 图参考 -> 暂停编辑 -> 多图出图链路】\n\n这里 5 个 LoadImage 节点每张图都一拖二：\n1. 接到 图生图提示词控制器 reference_image_01~05，用来综合分析并生成 optimized_prompt。\n2. 同时接到 Comfyui-Luck gpt-image-2 的 image_01~05，用来让最终出图真实参考这 5 张图。\n\ngpt-image-2 官方节点最多可接 image_01~16；本示例只演示 5 张，因为提示词控制器最多分析 5 张。\n\n正确执行链路：\n图生图提示词控制器 optimized_prompt -> 文本停留编辑器 text_list -> edited_text -> 后面出图节点 prompt。\n\n点击 Continue 只会放行当前等待中的流程，让后面的 gpt-image-2 继续生图；不要再次点击主运行按钮，否则会重新跑上游提示词增强。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 18,
       "type": "LoadImage",
       "pos": [
-        40,
-        3240
+        -681.232364339975,
+        2707.558032231631
       ],
       "size": [
         360,
         200
       ],
       "flags": {},
-      "order": 17,
-      "mode": 0,
+      "order": 7,
+      "mode": 2,
       "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             6,
             7
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -664,32 +713,32 @@
       "id": 19,
       "type": "LoadImage",
       "pos": [
-        40,
-        3450
+        -679.0000989823634,
+        3142.800117615686
       ],
       "size": [
         360,
         200
       ],
       "flags": {},
-      "order": 18,
-      "mode": 0,
+      "order": 8,
+      "mode": 2,
       "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             8,
             9
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -704,32 +753,32 @@
       "id": 20,
       "type": "LoadImage",
       "pos": [
-        40,
-        3660
+        -659.0000989823634,
+        3532.800117615686
       ],
       "size": [
         360,
         200
       ],
       "flags": {},
-      "order": 19,
-      "mode": 0,
+      "order": 9,
+      "mode": 2,
       "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             10,
             11
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -744,32 +793,32 @@
       "id": 21,
       "type": "LoadImage",
       "pos": [
-        40,
-        3870
+        -659.0000989823634,
+        3862.800117615686
       ],
       "size": [
         360,
         200
       ],
       "flags": {},
-      "order": 20,
-      "mode": 0,
+      "order": 10,
+      "mode": 2,
       "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             12,
             13
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -784,32 +833,32 @@
       "id": 22,
       "type": "LoadImage",
       "pos": [
-        40,
-        4080
+        -669.0000989823634,
+        4242.800117615687
       ],
       "size": [
         360,
         200
       ],
       "flags": {},
-      "order": 21,
-      "mode": 0,
+      "order": 11,
+      "mode": 2,
       "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             14,
             15
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -824,62 +873,142 @@
       "id": 23,
       "type": "ComfyuiLuckGPTImage2Node",
       "pos": [
-        1860,
-        3300
+        1050.9999010176366,
+        3612.800117615686
       ],
       "size": [
         540,
-        640
+        1022.375
       ],
       "flags": {},
-      "order": 24,
-      "mode": 0,
+      "order": 18,
+      "mode": 2,
       "inputs": [
         {
-          "name": "prompt (提示词)",
-          "type": "STRING",
-          "link": 19
-        },
-        {
           "name": "image_01",
+          "shape": 7,
           "type": "IMAGE",
           "link": 7
         },
         {
           "name": "image_02",
+          "shape": 7,
           "type": "IMAGE",
           "link": 9
         },
         {
           "name": "image_03",
+          "shape": 7,
           "type": "IMAGE",
           "link": 11
         },
         {
           "name": "image_04",
+          "shape": 7,
           "type": "IMAGE",
           "link": 13
         },
         {
           "name": "image_05",
+          "shape": 7,
           "type": "IMAGE",
           "link": 15
+        },
+        {
+          "name": "image_06",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_07",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_08",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_09",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_10",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_11",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_12",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_13",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_14",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_15",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "image_16",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        },
+        {
+          "name": "prompt (提示词)",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt (提示词)"
+          },
+          "link": 19
         }
       ],
       "outputs": [
         {
           "name": "image",
           "type": "IMAGE",
+          "slot_index": 0,
           "links": [
             17
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "response",
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -890,33 +1019,34 @@
         "",
         "AUTO",
         "gpt-image-2",
-        "https://api.apiyi.com/v1",
+        "https://api.hpc4s.cn:8317/v1",
         "2K",
         "16:9",
         "1600x1200",
         "high",
         "jpeg",
         85,
-        0,
+        1026379861,
         "randomize",
         600,
-        3
+        3,
+        ""
       ]
     },
     {
       "id": 24,
       "type": "PreviewImage",
       "pos": [
-        2480,
-        3300
+        1890.9999010176366,
+        4002.800117615686
       ],
       "size": [
         360,
         360
       ],
       "flags": {},
-      "order": 25,
-      "mode": 0,
+      "order": 19,
+      "mode": 2,
       "inputs": [
         {
           "name": "images",
@@ -925,22 +1055,25 @@
         }
       ],
       "outputs": [],
-      "properties": {}
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
     },
     {
       "id": 26,
       "type": "LuckTextListEditor",
       "pos": [
-        1240,
-        3300
+        1080.9999010176366,
+        2952.800117615686
       ],
       "size": [
         520,
         340
       ],
       "flags": {},
-      "order": 23,
-      "mode": 0,
+      "order": 16,
+      "mode": 2,
       "inputs": [
         {
           "name": "text_list",
@@ -952,16 +1085,17 @@
         {
           "name": "edited_text",
           "type": "STRING",
+          "slot_index": 0,
           "links": [
             19
-          ],
-          "slot_index": 0
+          ]
         },
         {
           "name": "edited_texts",
+          "shape": 6,
           "type": "STRING",
-          "links": null,
-          "slot_index": 1
+          "slot_index": 1,
+          "links": null
         }
       ],
       "properties": {
@@ -972,26 +1106,10 @@
   ],
   "links": [
     [
-      1,
-      1,
-      0,
-      2,
-      0,
-      "IMAGE"
-    ],
-    [
       2,
       6,
       0,
       7,
-      0,
-      "IMAGE"
-    ],
-    [
-      3,
-      9,
-      0,
-      10,
       0,
       "IMAGE"
     ],
@@ -1024,7 +1142,7 @@
       18,
       0,
       23,
-      1,
+      0,
       "IMAGE"
     ],
     [
@@ -1040,7 +1158,7 @@
       19,
       0,
       23,
-      2,
+      1,
       "IMAGE"
     ],
     [
@@ -1056,7 +1174,7 @@
       20,
       0,
       23,
-      3,
+      2,
       "IMAGE"
     ],
     [
@@ -1072,7 +1190,7 @@
       21,
       0,
       23,
-      4,
+      3,
       "IMAGE"
     ],
     [
@@ -1088,7 +1206,7 @@
       22,
       0,
       23,
-      5,
+      4,
       "IMAGE"
     ],
     [
@@ -1112,7 +1230,7 @@
       16,
       0,
       13,
-      0,
+      17,
       "STRING"
     ],
     [
@@ -1120,12 +1238,62 @@
       26,
       0,
       23,
-      0,
+      17,
       "STRING"
     ]
   ],
-  "groups": [],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Group 多参考图",
+      "bounding": [
+        -691.232364339975,
+        2637.558032231631,
+        3042.2322653576116,
+        2007.6170853840554
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Group 文生图提示词LLM优化",
+      "bounding": [
+        -656.5452389013784,
+        1251.562334080341,
+        2994.3056287444824,
+        1232.210119761832
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Group 直接文生图",
+      "bounding": [
+        -55.45906198580572,
+        -62.15185634523244,
+        1636.0813579477062,
+        1143.790511178147
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    }
+  ],
   "config": {},
-  "extra": {},
+  "extra": {
+    "ds": {
+      "scale": 0.2072585480093707,
+      "offset": [
+        3052.5755449389035,
+        269.5655947746805
+      ]
+    },
+    "frontendVersion": "1.44.19",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
   "version": 0.4
 }

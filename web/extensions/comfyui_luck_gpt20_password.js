@@ -4,7 +4,6 @@ const EXTENSION_NAME = "comfyui_luck_gpt20.password_widget";
 const API_KEY_WIDGET_NAME = "api_key (API密钥)";
 const TARGET_NODE_TYPES = new Set([
     "ComfyuiLuckGPT20Node",
-    "ComfyuiLuckGPTImage2VipNode",
     "ComfyuiLuckGPTImage2Node",
     "LuckReferenceImagePromptOptimizer",
     "LuckGPTImage2PromptOptimizer",
