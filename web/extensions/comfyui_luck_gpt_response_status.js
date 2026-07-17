@@ -1,14 +1,14 @@
 import { app } from "../../../scripts/app.js";
 import { api } from "../../../scripts/api.js";
 
-const EXTENSION_NAME = "comfyui_luck_gpt20.runtime_status";
+const EXTENSION_NAME = "comfyui_luck_gpt_response.runtime_status";
 const TARGET_NODE_TYPES = new Set([
-    "ComfyuiLuckGPT20Node",
+    "ComfyuiLuckGPTResponseNode",
     "ComfyuiLuckGPTImage2Node",
     "LuckReferenceImagePromptOptimizer",
     "LuckGPTImage2PromptOptimizer",
 ]);
-const STATUS_EVENT = "comfyui_luck_gpt20_status";
+const STATUS_EVENT = "comfyui_luck_gpt_response_status";
 
 const runtimeStateByNodeId = new Map();
 let tickerHandle = null;

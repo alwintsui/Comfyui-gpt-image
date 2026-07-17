@@ -1,88 +1,170 @@
 # Comfyui-Luck gpt-2.0
 
-OpenAI GPT 图像模型的 ComfyUI 自定义节点包，当前包含出图节点和提示词控制节点：
+[简体中文](README_CN.md)
 
-> **重要说明**
->
-> 本自定义节点支持原生OpenAI key或者上游代理key访问，当前默认使用gpt-image-2图像模型。本项目从Comfyui-Luck-gpt2.0 [GitHub Issues](https://github.com/luckdvr/Comfyui-Luck-gpt2.0/issues) 修改而来，删除ComfyuiLuckGPTImage2VipNode节点（Comfyui-Luck gpt-image-2-vip），增加了首先从环境变量OPENAI_BASE_URL和OPENAI_API_KEY中读取base-url和api-key的取值，base-url提供可选值列表，api-key可以从节点属性输入，并且提供隐藏功能，注意导出分享工作流需要把API key清空。
+A ComfyUI custom-node package for OpenAI-compatible image generation and prompt understanding. It supports the native OpenAI API as well as compatible proxy services, with API keys and base URLs configurable through environment variables or node widgets.
 
-| 节点 | 模型 | 适合场景 | 尺寸控制 |
-|---|---|---|---|
-| `Comfyui-Luck gpt-image-2` | `gpt-image-2` | 需要真实 size、2K/4K、自定义尺寸、quality、mask | 真正传 `size` API 参数 |
+> [!IMPORTANT]
+> Model availability, accepted parameters, output formats, pricing, and latency depend on the selected upstream service. The package registers one Responses API image-tool node and one direct Images API node. Read the node comparison below before choosing one.
 
-| 提示词节点 | 默认模型 | 适合场景 |
+## Features
+
+- Official-style `responses`, `images/generations`, and `images/edits` image-generation requests.
+- Conversational image generation and editing through the Responses API `image_generation` tool.
+- Full `gpt-image-2` size, quality, output-format, multi-image, and mask controls in the Images API node.
+- Up to 16 reference images in the full Images API node.
+- Text-to-image and reference-image prompt optimizers.
+- A workflow pause node for manually editing generated prompts before image generation continues.
+- `OPENAI_API_KEY` and `OPENAI_BASE_URL` environment-variable support.
+- A real password DOM widget with a show/hide button for API-key fields.
+- Runtime status bars with elapsed time and retry-aware estimated progress.
+- Image-generation nodes automatically retry HTTP `408`, `429`, and `5xx` responses.
+
+## Registered nodes
+
+| Display name | Internal class | Purpose |
 |---|---|---|
-| `GPT-Image-2 文生图提示词控制器` | `gemini-3.5-flash` | 将文字需求整理为更适合 GPT-Image-2 的结构化生图提示词 |
-| `图生图提示词控制器` | `gemini-3.5-flash` | 读取最多 5 张参考图和可选主体图，生成带风格、构图、版式约束的出图提示词 |
-| `文本停留编辑器` | - | 工作流执行中暂停，手动编辑文本后继续 |
+| `Comfyui-Luck OpenAI Responses Image` | `ComfyuiLuckGPTResponseNode` | Uses a mainline GPT model such as `gpt-5.6` to call the Responses API `image_generation` tool. Supports reference images, generated-image editing, and multi-turn continuation with `previous_response_id`. |
+| `Comfyui-Luck gpt-image-2` | `ComfyuiLuckGPTImage2Node` | Full Images API node with real size, quality, format, up to 16 reference images, and mask editing. |
+| `GPT-Image-2 文生图提示词控制器` | `LuckGPTImage2PromptOptimizer` | Two-stage text prompt optimizer: requirement schema extraction followed by final prompt rendering. |
+| `图生图提示词控制器` | `LuckReferenceImagePromptOptimizer` | Multimodal prompt optimizer using one required and up to four optional reference images, plus an optional subject image. |
+| `文本停留编辑器` | `LuckTextListEditor` | Pauses workflow execution so text can be edited in the browser before downstream nodes continue. |
 
-提示词控制器使用 API易 OpenAI 兼容 `POST /v1/chat/completions`，和 Luck 出图节点一样使用 `Authorization: Bearer YOUR_API_KEY`。模型下拉包含 `gemini-3.5-flash`、`gpt-5.6`、`gpt-5.5`、`gpt-4o`、`gpt-4.1-mini`、`gemini-2.5-flash`、`gemini-2.5-pro`。
+The removed `ComfyuiLuckGPTImage2VipNode` / `Comfyui-Luck gpt-image-2-vip` node is no longer registered. Workflows that still contain it must replace it with one of the two image nodes above.
 
-`图生图提示词控制器` 的 `reference_image_01` 必填，`reference_image_02` 到 `reference_image_05` 可选；多张参考图会一起发送给多模态模型综合分析。`subject_image` 仍然是可选主体图，用来锁定最终画面的核心产品或人物。
+## Installation
 
-多图参考的推荐接法：
-
-- 只把图片接到 `图生图提示词控制器`：只做图像理解和提示词增强，后面可以按文生图使用优化后的 prompt。
-- 同一批图片同时接到后面的出图节点：才是真正的多图参考 / 多图编辑 / 多图融合。
-- 5 张图以内，优先接 `图生图提示词控制器` 一起分析，再把同一批图接到后面的出图节点。
-- `Comfyui-Luck gpt-image-2` 支持最多 16 张参考图，并支持真实 size、quality 和 mask。
-
-完整链路示例：
-
-```text
-5张参考图
-  ├─ 接到 图生图提示词控制器 reference_image_01~reference_image_05
-  └─ 同时接到 Comfyui-Luck gpt-image-2 image_01~image_05
-
-图生图提示词控制器 optimized_prompt
-  └─ 接到 Comfyui-Luck gpt-image-2 prompt
-```
-
-如果其中一张图是必须锁定的主体图，可以额外接到 `subject_image`，并放在后面出图节点的 `image_01`。
-
-暂停编辑后再出图的推荐接法：
-
-```text
-提示词控制器 optimized_prompt
-  └─ 接到 文本停留编辑器 text_list
-
-文本停留编辑器 edited_text
-  └─ 接到 出图节点 prompt
-```
-
-`edited_text` 是单条字符串，适合接普通出图节点的 prompt。`edited_texts` 是列表输出，保留给批量文本工作流使用。
-
-运行时请对最终 `PreviewImage` 或 `SaveImage` 发起队列执行。流程停在 `文本停留编辑器` 后，点击节点上的 `Continue` 即可让当前执行继续到后面的出图节点；不要再次点击主运行按钮，否则 ComfyUI 会重新排队并重新执行上游提示词增强。
-
-## 安装
-
-1. 把整个目录复制到 ComfyUI 的 `custom_nodes` 目录。
-2. 安装依赖：
+1. Copy or clone this repository into `ComfyUI/custom_nodes/`.
+2. Install the Python dependencies:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-3. 重启 ComfyUI，搜索 `Comfyui-Luck`。
+3. Restart ComfyUI.
+4. Search for `Comfyui-Luck` in the node menu.
 
-## 节点：Comfyui-Luck gpt-image-2
+Dependencies declared by the project:
 
-使用官方契约的 `gpt-image-2`。
+- `numpy`
+- `Pillow`
+- `requests`
+- `torch`
 
-特点：
+## Authentication and base URL
 
-- 真正传 `size` 参数，面板按 Nano 风格拆成 `image_size (分辨率)` + `aspect_ratio (宽高比)`。
-- `quality`：`auto`、`low`、`medium`、`high`。
-- `output_format`：`png`、`jpeg`、`webp`。
-- `output_compression`：`jpeg` / `webp` 时可用，范围 0-100。
-- 支持最多 16 张参考图。
-- 支持可选 `mask` 局部重绘，透明区域 = 要重绘，不透明区域 = 保留。
+### API key resolution
 
-尺寸换算：
+The same rule is used by both image nodes and both prompt-optimizer nodes:
 
-| aspect_ratio | 1K | 2K | 4K |
+1. If the node field `api_key (API密钥)` is non-empty after trimming whitespace, that value is used directly.
+2. If the field is empty, the code reads `OPENAI_API_KEY`.
+3. If both are empty, execution stops with an error.
+
+The frontend replaces the normal ComfyUI STRING widget with a real `<input type="password">` and adds a `显示/隐藏` (Show/Hide) button.
+
+> [!WARNING]
+> Password masking only hides the value on screen. A key entered into a node can still be serialized into the workflow JSON. Clear API-key fields before sharing or publishing workflows.
+
+### Base URL resolution
+
+`DEFAULT_API_BASE_URL` is evaluated when the Python module is imported:
+
+1. Use trimmed `OPENAI_BASE_URL` when it is non-empty.
+2. Otherwise use `https://api.hpc4s.cn:8317/v1`.
+
+The node dropdown is built from:
+
+1. The resolved default URL above.
+2. `https://api.hpc4s.cn/v1`
+3. `https://api.openai.com/v1`
+4. `https://api.apiyi.com/v1`
+
+To use another compatible proxy, set `OPENAI_BASE_URL` before starting ComfyUI. Restart ComfyUI after changing either environment variable.
+
+Linux/macOS example:
+
+```bash
+export OPENAI_API_KEY="sk-your-api-key"
+export OPENAI_BASE_URL="https://api.openai.com/v1"
+python3 main.py
+```
+
+PowerShell example:
+
+```powershell
+$env:OPENAI_API_KEY = "sk-your-api-key"
+$env:OPENAI_BASE_URL = "https://api.openai.com/v1"
+python main.py
+```
+
+Base URLs ending in `/v1` are used directly. For a base URL without `/v1`, the code inserts `/v1` before the endpoint path.
+
+### Timeouts
+
+HTTP requests use a fixed connection timeout of 60 seconds. The node's `timeout_seconds (超时秒数)` value is used as the read timeout.
+
+## Image node comparison
+
+| Capability | `Comfyui-Luck OpenAI Responses Image` | `Comfyui-Luck gpt-image-2` |
+|---|---|---|
+| Model type | Mainline GPT model: `gpt-5.6`, `gpt-5.5`, `gpt-5.4`, or `gpt-5` | Direct image model: `gpt-image-2` |
+| Endpoint | `/v1/responses` | `/v1/images/generations` or `/v1/images/edits` |
+| Text-to-image | Yes | Yes |
+| Image editing | Up to 14 reference images or previous response context | Up to 16 images |
+| Mask | No | Yes |
+| Multi-turn editing | Yes, through `previous_response_id` | No |
+| Real size and quality fields | Sent inside the `image_generation` tool | Sent directly to the Images API |
+| Output format | `png`, `jpeg`, or `webp` tool options | `png`, `jpeg`, or `webp` request fields |
+| Response image field | `output[].result` from an `image_generation_call` | `data[].b64_json` |
+| Outputs | `image`, `response`, `response_id` | `image`, `response` |
+| Default read timeout | 600 seconds | 600 seconds |
+
+## `Comfyui-Luck OpenAI Responses Image`
+
+This node calls `POST /v1/responses` with a mainline GPT model and the built-in `image_generation` tool. Its internal class and registered node type are both `ComfyuiLuckGPTResponseNode`; the old `ComfyuiLuckGPT20Node` registration and proxy Images API / Chat Completions implementation have been removed.
+
+### Important behavior
+
+- `model (模型)` selects the mainline model that decides when and how to call the image tool. The image model itself is selected by the Responses API.
+- `action (操作)`:
+  - `auto`: lets the model decide whether to generate or edit.
+  - `generate`: forces creation of a new image.
+  - `edit`: requires at least one reference image or a `previous_response_id` containing image context.
+- `image_size (分辨率)` is a single text field. Enter an explicit size such as `1024x1024` or `1024x3072`; enter `auto` to omit the tool's `size` field.
+- Explicit sizes must use `WIDTHxHEIGHT` and satisfy the GPT Image 2 constraints: both edges are multiples of 16, maximum edge 3840, ratio no greater than `3:1`, and total pixels from `655,360` through `8,294,400`.
+- `quality`, `output_format`, `output_compression`, and `background` are sent as additional `image_generation` tool options.
+- Supports `image_01` through `image_14`.
+- Connected images are encoded as Responses API `input_image` content items.
+- `previous_response_id (上次响应ID)` continues an earlier Responses conversation for iterative image editing.
+- Generated images are decoded from `output[]` items whose type is `image_generation_call`.
+- The `response_id` output can be connected to another Responses Image node's `previous_response_id` input.
+- `seed (种子)` is a ComfyUI control only and is not sent to the API.
+
+## `Comfyui-Luck gpt-image-2`
+
+This node implements the full Images API request contract used by the project.
+
+### Inputs and request behavior
+
+- `mode (模式)` uses the same `AUTO` / `text2img` / `img2img` behavior described above.
+- Text-to-image calls `/v1/images/generations` with JSON.
+- Image editing calls `/v1/images/edits` with multipart `image[]` files.
+- Supports `image_01` through `image_16`.
+- An optional `mask` is sent as `mask.png`; a mask requires at least one input image.
+- ComfyUI mask value `1` is treated as the edit area and converted to transparent alpha for the API mask.
+- `quality` is omitted when set to `auto`.
+- `output_format` and `output_compression` are sent only for `jpeg` or `webp`; `png` leaves both fields out.
+- The response parser expects one or more `data[].b64_json` images. A proxy that returns URL-only data is not compatible with this node's current parser.
+- `seed` is not sent to the API.
+
+### Preset size table
+
+The code declares the following preset table:
+
+| Aspect ratio | 1K | 2K | 4K |
 |---|---:|---:|---:|
-| `AUTO` | 不传 size | 不传 size | 不传 size |
+| `AUTO` | `auto` | `auto` | `auto` |
 | `1:4` | `480x1440` | `672x2016` | `1280x3840` |
 | `4:1` | `1440x480` | `2016x672` | `3840x1280` |
 | `1:8` | `480x1440` | `672x2016` | `1280x3840` |
@@ -103,90 +185,155 @@ python3 -m pip install -r requirements.txt
 | `9:21` | `640x1488` | `960x2240` | `1648x3840` |
 | `21:9` | `1344x576` | `2464x1056` | `3808x1632` |
 
-说明：
+### Custom size validation
 
-- `aspect_ratio` 列表和提示词控制器保持一致：`AUTO`、`1:4`、`4:1`、`1:8`、`8:1`、`1:1`、`1:2`、`2:1`、`1:3`、`3:1`、`2:3`、`3:2`、`3:4`、`4:3`、`4:5`、`5:4`、`9:16`、`16:9`、`9:21`、`21:9`。
-- `auto (不传size)` 或 `aspect_ratio=AUTO` 会让 API 自适应。
-- `gpt-image-2` 官方限制长边/短边 <= 3:1，所以 `1:4`、`4:1`、`1:8`、`8:1` 会自动收敛到最接近的合法边界尺寸，不会硬传非法比例。
-- `4K` 档位尽量取合法大尺寸；`4K + 1:1` 不是 `3840x3840`，因为总像素会超官方上限，所以使用 `2880x2880`。
-- 超过 `2560x1440` 总像素量的输出，官方提示属于实验性，可能更慢或更容易超时。
+When `image_size (分辨率)` is `custom (自定义)`, `custom_size (仅custom填写: 宽x高)` must satisfy all of the following:
 
-`custom_size` 只在 `image_size` 选择 `custom (自定义)` 时填写，格式如 `1600x1200`、`3072x1024`、`1024x3072`。选择 1K/2K/4K 时会忽略这个输入框。
+- Format: `WIDTHxHEIGHT`, for example `1600x1200`.
+- Width and height must be multiples of 16.
+- Maximum side must not exceed 3840 pixels.
+- Long side / short side must not exceed `3:1`.
+- Total pixels must be between `655,360` and `8,294,400`.
 
-`custom_size` 约束：
+Setting `image_size` to `auto (不传size)` or choosing `aspect_ratio=AUTO` for a preset resolves to `auto`, so the request omits `size`.
 
-- 最大边 <= 3840px。
-- 宽和高都是 16 的倍数。
-- 长边/短边 <= 3:1，也就是说 3:1 和 1:3 都可以，超过不行。
-- 总像素在 655,360 到 8,294,400 之间。
+### Old workflow compatibility
 
-说明：
+The node includes recovery logic for old workflows whose widget values shifted after converting `prompt` into an input. If a loaded workflow still displays incorrect values, reload it or replace the node with a newly created `Comfyui-Luck gpt-image-2` node.
 
-- `gpt-image-2` 返回的 `b64_json` 是纯 base64，不带 `data:image/...;base64,` 前缀；节点会自动解码成 ComfyUI 图片。
-- 节点不会发送 `input_fidelity`。
-- 节点主面板不再显示 `background` / `moderation`，默认不传，使用 API 默认值。
-- 推荐超时按 `quality` 分档：`low` 至少 `120` 秒，`medium` 至少 `240` 秒，`high` 建议 `600` 秒起步；节点默认 `600` 秒。
-- `408`、`429`、`5xx` 会按 `retry_times` 自动重试。`408 Timeout` 通常是 APIYi 上游生成任务超时，不是节点参数填错。
+## Prompt optimizer nodes
 
-`background` / `moderation` 原本的作用：
+Both prompt optimizers call `/v1/chat/completions` with `stream: false` and use the same API-key/base-URL resolution described above.
 
-- `background`: OpenAI Images API 的背景控制字段。`gpt-image-2` 不支持 `transparent`，而 `auto` / `opaque` 对大多数普通出图区别不明显，所以节点默认不传。
-- `moderation`: 文生图审核强度，通常是 `auto` 或 `low`。它不属于图片编辑接口的核心字段，日常使用默认即可，所以节点主面板不再暴露。
+Available model values:
 
-## API 域名
+- `gpt-5.6-terra`
+- `gpt-5.6-sol`
+- `gpt-5.5`
+- `gpt-4o`
+- `gpt-4.1-mini`
+- `gemini-3.5-flash` (UI default)
+- `gemini-2.5-pro`
 
-可选域名：
+Availability is determined by the selected upstream service. The `seed` widgets are not sent in API payloads.
 
-- OpenAI域名：`https://api.openai.com/v1`
-- 第三方推荐：
-  - HPC4S：`https://api.hpc4s.cn:8317/v1`、`https://api.hpc4s.cn/v1`
-  - 易API域名：`https://api.apiyi.com`、`https://api.apiyi.com/v1`
+### `GPT-Image-2 文生图提示词控制器`
 
-节点底层会兼容带 `/v1` 和不带 `/v1` 的 base url，并把超时拆成连接超时 `30` 秒 + 节点面板里的读取超时秒数，减少长耗时生成时的中断。
+This text-only optimizer performs two API calls:
 
-鉴权格式：
+1. Convert the request into a structured schema.
+2. Render the schema into a final image-generation prompt.
+
+Main controls:
+
+- `layout_type`: automatic, image only, mixed text/image poster, e-commerce hero image, or social-media cover.
+- `text_policy`: no text, preserve source text, improve source text, or generate text.
+- `optimize_strength`: standard or enhanced.
+- `aspect_ratio`: target composition ratio.
+- `exact_text`: text that should be preserved or used by the selected text policy.
+
+Outputs:
+
+- `optimized_prompt`
+- `debug_info`, including model information, normalized schema, renderer input, and final prompt.
+
+### `图生图提示词控制器`
+
+- `reference_image_01` is required.
+- `reference_image_02` through `reference_image_05` are optional.
+- `subject_image` is optional and is sent before reference images to identify the subject that should be preserved.
+- Reference modes include automatic, full reference, style only, composition only, color/lighting only, and layout only.
+- Outputs `optimized_prompt` and `reference_summary`.
+
+Connecting images only to this optimizer performs image understanding and prompt generation. To make final image generation actually reference those images, connect the same images to the downstream image node as well.
+
+## `文本停留编辑器`
+
+This node pauses the current execution and opens editable text widgets in the browser.
+
+Recommended chain:
 
 ```text
-Authorization: Bearer YOUR_API_KEY
+Prompt optimizer optimized_prompt
+  -> 文本停留编辑器 text_list
+  -> edited_text
+  -> image node prompt
 ```
 
-项目的前端扩展会把节点中的 `api_key (API密钥)` 替换为真正的密码输入框，默认隐藏内容，并提供“显示/隐藏”切换按钮。API key 的读取规则如下：
+- `Continue` submits the edited text and resumes the waiting execution.
+- `Cancel` interrupts the current execution.
+- The wait times out after 3600 seconds and interrupts processing.
+- `edited_text` joins non-empty items with newlines and is suitable for a normal prompt input.
+- `edited_texts` preserves the list output for batch workflows.
 
-- 输入框为空：读取环境变量 `OPENAI_API_KEY`。
-- 输入框为其他非空内容：直接使用输入框中的值。
-- 输入框需要读取环境变量但 `OPENAI_API_KEY` 未设置或为空：节点会报错并停止请求。
+Queue the final `PreviewImage` or `SaveImage` node. While execution is waiting in the editor, use `Continue`; do not press the main queue button again, or upstream prompt generation will run again.
 
-Linux/macOS 可以在启动 ComfyUI 前设置：
+## Frontend extensions
 
-```bash
-export OPENAI_API_KEY="sk-your-api-key"
-```
+### Password widget
 
-## 示例工作流
+The password extension targets both image nodes and both prompt optimizers. It preserves the original widget name, position, value, and workflow serialization while replacing the visual control with a password input.
 
-打开 `example_workflow.json`。
+After installing or updating the extension, restart ComfyUI and hard-refresh the browser if the API key still appears as a normal text widget.
 
-里面包含：
+### Runtime status bar
 
-- 一个 `gpt-image-2` 示例，使用真实 `size=2048x1152`、`quality=high`、`output_format=jpeg`。
-- 中文 Note 节点，说明模型选择、提示词比例控制、真实尺寸控制和图片编辑/mask 用法。
+Both image nodes and both prompt optimizers receive a status bar showing:
 
-分享工作流前请清空 API Key。
+- Current phase/message.
+- Elapsed time.
+- Current attempt or processing stage.
+- Estimated progress based on timeout and retry state.
+- Success or error state.
 
-## 常见问题
+The percentage is a local estimate, not progress reported by the upstream model.
 
-### gpt-image-2-all 能不能硬控 2K / 4K？
+## Example workflow
 
-不能。`gpt-image-2-all` 没有 `size` 参数，2K / 4K 只能作为 prompt 描述，无法保证输出像素。当前节点只前置官方推荐比例写法，不额外加入噪音尺寸描述。
+Open `example_workflow.json`. It currently contains three groups:
 
-### 哪个节点能真实控制分辨率？
+1. Direct `gpt-image-2` text-to-image generation.
+2. Text prompt optimization -> manual text editing -> image generation.
+3. Five reference images -> multimodal prompt optimization -> manual text editing -> multi-image generation.
 
-如果需要真实 `size`、`quality` 或 mask 局部重绘，用 `Comfyui-Luck gpt-image-2`。`gpt-image-2-all` 只能用 prompt 控制比例，不能承诺像素级锁尺寸。
+Some demonstration nodes are saved in bypass mode. Enable the group or nodes you want to run, provide images where required, and queue the final preview node.
 
-### 加载旧工作流报 `Value 3 smaller than min of 30`？
+Before sharing the workflow, clear every API-key widget.
 
-这是旧工作流 widget 顺序不匹配导致的：`retry_times=3` 被错读成了 `timeout_seconds=3`。请使用当前 `example_workflow.json`，或重新添加节点。
+## Troubleshooting
 
-### 接入 `文本停留编辑器` 后，`gpt-image-2` 报 `Value not in list`？
+### `API Key 为空，且环境变量 OPENAI_API_KEY 未设置`
 
-这是把 `prompt` 转成输入口后，旧 workflow 少了一个 prompt 占位，导致后面的控件整体前移：例如 `mode` 被读成 `gpt-image-2`、`api_base` 被读成 `2K`、`image_size` 被读成 `16:9`。当前节点会在校验阶段放行，并在运行时自动把这些错位参数恢复；新 `example_workflow.json` 也已经补好占位。若界面上仍显示错位，重载当前工作流或重新添加 `Comfyui-Luck gpt-image-2` 节点即可。
+Enter a key in the node or set `OPENAI_API_KEY` before starting ComfyUI.
+
+### A changed `OPENAI_BASE_URL` is not visible
+
+The default is read when the Python module is imported. Restart ComfyUI after changing the variable.
+
+### Responses API returned text but no image
+
+`Comfyui-Luck OpenAI Responses Image` requires an `image_generation_call` containing a base64 `result`. Make the prompt explicitly request an image, verify that the selected mainline model supports the image-generation tool, and check that the configured Base URL implements `POST /v1/responses`.
+
+### An old workflow contains `ComfyuiLuckGPT20Node` or `Comfyui-Luck gpt-2.0 all`
+
+The old internal node type is no longer registered. Remove the missing old node and add a new `Comfyui-Luck OpenAI Responses Image` node.
+
+### A Responses Image workflow still shows separate size, aspect-ratio, or custom-size widgets
+
+The Responses node now uses one explicit `image_size` text field. Remove the old node instance and add a new `Comfyui-Luck OpenAI Responses Image` node so legacy positional widget values are not shifted into the remaining controls.
+
+### `mask 只能和 image_01 一起用于图片编辑`
+
+Connect at least one image when using a mask. The first connected image is the base image for the mask edit.
+
+### Timeout, `408`, `429`, or `5xx`
+
+Increase the read timeout for slow generation. The nodes retry retryable HTTP statuses up to `retry_times`. Connection setup still has a fixed 60-second timeout.
+
+### An old workflow contains `ComfyuiLuckGPTImage2VipNode`
+
+That node has been removed. Replace it with `Comfyui-Luck gpt-image-2` for direct Images API generation, or `Comfyui-Luck OpenAI Responses Image` for conversational image generation.
+
+## License
+
+[Apache License 2.0](LICENSE)

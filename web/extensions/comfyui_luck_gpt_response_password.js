@@ -1,9 +1,9 @@
 import { app } from "../../../scripts/app.js";
 
-const EXTENSION_NAME = "comfyui_luck_gpt20.password_widget";
+const EXTENSION_NAME = "comfyui_luck_gpt_response.password_widget";
 const API_KEY_WIDGET_NAME = "api_key (API密钥)";
 const TARGET_NODE_TYPES = new Set([
-    "ComfyuiLuckGPT20Node",
+    "ComfyuiLuckGPTResponseNode",
     "ComfyuiLuckGPTImage2Node",
     "LuckReferenceImagePromptOptimizer",
     "LuckGPTImage2PromptOptimizer",
